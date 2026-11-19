@@ -539,7 +539,7 @@
     }
     const sep = APPS_SCRIPT_URL.indexOf('?') === -1 ? '?' : '&';
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
     try {
       const resp = await fetch(`${APPS_SCRIPT_URL}${sep}page=departments`, {
         method: 'GET',
@@ -1165,8 +1165,7 @@
         return;
       } catch (err) {
         lastErr = err;
-        const msg = err && err.message ? err.message : '';
-        if (window.location.protocol === 'file:' || msg === 'APPS_SCRIPT_HTML_RESPONSE') {
+        if (window.location.protocol === 'file:') {
           break;
         }
         if (attempt < MAX_ATTEMPTS) {
