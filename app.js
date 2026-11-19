@@ -620,8 +620,12 @@
   // ==========================================
   // 4. DOM References & App State
   // ==========================================
-  const gifBackdrop = document.getElementById('gifBackdrop');
-  const gifStage = document.getElementById('gifStage');
+  const gifBackdropA = document.getElementById('gifBackdropA');
+  const gifBackdropB = document.getElementById('gifBackdropB');
+  const gifStageA = document.getElementById('gifStageA');
+  const gifStageB = document.getElementById('gifStageB');
+  const gifBackdropLayers = [gifBackdropA, gifBackdropB];
+  const gifStageLayers = [gifStageA, gifStageB];
   const storySegments = document.getElementById('storySegments');
   const chapterBadge = document.getElementById('chapterBadge');
   const floorBadge = document.getElementById('floorBadge');
@@ -664,6 +668,9 @@
   let quizCycleTimer = null;
   let isTyping = false;
   let activeGifUrl = 'webp/Nurses_talking_in_elevator_8afa24f8.webp';
+  let activeLayerIdx = 0;
+  let stageLoadSeq = 0;
+  let selectedChoice1 = null;
   let lastFloor = '07F';
 
   // Participation state
@@ -723,13 +730,24 @@
   }
 
   function preloadGif(url) {
-    if (!url || preloadedGifs.has(url)) return;
+    if (!url || preloadedGifs.has(url)) return Promise.resolve();
     preloadedGifs.add(url);
-    const img = new Image();
-    img.src = url;
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (typeof img.decode === 'function') {
+          img.decode().then(resolve).catch(resolve);
+        } else {
+          resolve();
+        }
+      };
+      img.onerror = resolve;
+      img.src = url;
+    });
   }
 
   function preloadAhead(step) {
+    if (!step) return;
     preloadGif(step.gif);
     if (step.nextId) {
       const n1 = getStepById(step.nextId);
@@ -741,27 +759,99 @@
         }
       }
     }
-    if (step.id === 'choice-1') {
-      const safe1 = getStepById('safe-1');
-      const risk1 = getStepById('4-2-1');
-      if (safe1) preloadGif(safe1.gif);
-      if (risk1) preloadGif(risk1.gif);
+    if (step.id === 'choice-1' || step.id.startsWith('safe-')) {
+      ['safe-1', 'safe-2', 'safe-result', '4-2-1', '4-3-intro', '4-3'].forEach((targetId) => {
+        const targetStep = getStepById(targetId);
+        if (targetStep) preloadGif(targetStep.gif);
+      });
     }
   }
+
+  async function startBackgroundPreloadQueue() {
+    const uniqueUrls = [];
+    STORY_STEPS.forEach((s) => {
+      if (s.gif && uniqueUrls.indexOf(s.gif) === -1) {
+        uniqueUrls.push(s.gif);
+      }
+    });
+    for (let i = 0; i < uniqueUrls.length; i++) {
+      await preloadGif(uniqueUrls[i]);
+      await new Promise((r) => setTimeout(r, 120));
+    }
+  }
+
+  function waitImageReady(imgEl, url, expectedSeq) {
+    if (!imgEl) return Promise.resolve(true);
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        resolve(Boolean(ok && expectedSeq === stageLoadSeq && imgEl.naturalWidth > 0));
+      };
+      if (imgEl.getAttribute('src') === url && imgEl.complete && imgEl.naturalWidth > 0) {
+        if (typeof imgEl.decode === 'function') {
+          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
+        } else {
+          finish(true);
+        }
+        return;
+      }
+      imgEl.onload = () => {
+        if (typeof imgEl.decode === 'function') {
+          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
+        } else {
+          finish(true);
+        }
+      };
+      imgEl.onerror = () => finish(false);
+      imgEl.src = url;
+      if (imgEl.complete && imgEl.naturalWidth > 0) {
+        if (typeof imgEl.decode === 'function') {
+          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
+        } else {
+          finish(true);
+        }
+      }
+    });
+  }
+
+  let layerRetireTimer = null;
 
   function setStageGif(url) {
     if (!url || activeGifUrl === url) return;
     activeGifUrl = url;
-    if (gifStage) {
-      gifStage.classList.add('fading');
-      gifStage.src = url;
-      setTimeout(() => {
-        gifStage.classList.remove('fading');
-      }, 150);
-    }
-    if (gifBackdrop) {
-      gifBackdrop.src = url;
-    }
+    const seq = ++stageLoadSeq;
+    const nextIdx = activeLayerIdx === 0 ? 1 : 0;
+    const currStage = gifStageLayers[activeLayerIdx];
+    const nextStage = gifStageLayers[nextIdx];
+    const currBackdrop = gifBackdropLayers[activeLayerIdx];
+    const nextBackdrop = gifBackdropLayers[nextIdx];
+
+    if (!currStage || !nextStage) return;
+
+    Promise.all([
+      waitImageReady(nextStage, url, seq),
+      waitImageReady(nextBackdrop, url, seq)
+    ]).then(([stageOk, backdropOk]) => {
+      if (!stageOk || !backdropOk || seq !== stageLoadSeq) return;
+      if (layerRetireTimer) {
+        clearTimeout(layerRetireTimer);
+        layerRetireTimer = null;
+      }
+      // Keep current layer visible at opacity:1 underneath while next layer fades in on top
+      currStage.classList.remove('is-top');
+      if (currBackdrop) currBackdrop.classList.remove('is-top');
+      nextStage.classList.add('is-top', 'is-visible');
+      if (nextBackdrop) nextBackdrop.classList.add('is-top', 'is-visible');
+      activeLayerIdx = nextIdx;
+
+      layerRetireTimer = setTimeout(() => {
+        if (seq !== stageLoadSeq) return;
+        currStage.classList.remove('is-visible');
+        if (currBackdrop) currBackdrop.classList.remove('is-visible');
+      }, 240);
+    });
   }
 
   const QUIZ_BG_CYCLE = [
@@ -943,6 +1033,7 @@
     if (interactiveSheet) interactiveSheet.classList.add('active');
 
     if (step.type === 'choice1' && panelChoice1) {
+      clearChoice1Selection();
       panelChoice1.classList.add('active');
     } else if (step.type === 'safeResult' && panelSafeResult) {
       panelSafeResult.classList.add('active');
@@ -1066,6 +1157,7 @@
 
   function resetAllEducation() {
     clearTimers();
+    clearChoice1Selection();
     resetQuiz();
     resetPuzzle();
     resetFeedbackSection();
@@ -1102,10 +1194,36 @@
   const watchRiskBranchBtn = document.getElementById('watchRiskBranchBtn');
   const skipToQuizBtn = document.getElementById('skipToQuizBtn');
 
+  function clearChoice1Selection() {
+    selectedChoice1 = null;
+    if (!choice1Options) return;
+    choice1Options.querySelectorAll('.choice-row').forEach((row) => {
+      row.classList.remove('selected');
+      const goBtn = row.querySelector('.choice-go-btn');
+      if (goBtn) goBtn.setAttribute('tabindex', '-1');
+    });
+  }
+
   if (choice1Options) {
     choice1Options.querySelectorAll('.choice-btn').forEach((btn) => {
       btn.addEventListener('click', function () {
         const val = this.getAttribute('data-choice');
+        selectedChoice1 = val;
+        Sound.tap();
+        choice1Options.querySelectorAll('.choice-row').forEach((row) => {
+          const isTarget = row.getAttribute('data-choice') === val;
+          row.classList.toggle('selected', isTarget);
+          const goBtn = row.querySelector('.choice-go-btn');
+          if (goBtn) goBtn.setAttribute('tabindex', isTarget ? '0' : '-1');
+        });
+      });
+    });
+
+    choice1Options.querySelectorAll('.choice-go-btn').forEach((goBtn) => {
+      goBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const val = this.getAttribute('data-choice');
+        if (!val || val !== selectedChoice1) return;
         if (val === 'pause') {
           Sound.correct();
           navigateTo('safe-1', true);
@@ -1732,5 +1850,8 @@
     updateSimulatorUI(true);
     renderPoll();
     loadDepartmentsFromSheet();
+    setTimeout(() => {
+      startBackgroundPreloadQueue();
+    }, 600);
   });
 })();

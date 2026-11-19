@@ -51,7 +51,8 @@ body {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background: #000;
+  overflow: clip;
+  background: #0d111a;
   box-shadow: 0 0 48px rgba(0, 0, 0, 0.75);
 }
 
@@ -66,6 +67,16 @@ body {
   pointer-events: none;
   user-select: none;
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.gif-backdrop-img.is-visible {
+  opacity: 1;
+}
+
+.gif-backdrop-img.is-top {
+  z-index: 2;
 }
 
 .gif-stage-img {
@@ -76,12 +87,17 @@ body {
   object-fit: contain;
   pointer-events: none;
   user-select: none;
-  z-index: 2;
-  transition: opacity 0.16s ease;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.22s ease;
 }
 
-.gif-stage-img.fading {
-  opacity: 0.72;
+.gif-stage-img.is-visible {
+  opacity: 1;
+}
+
+.gif-stage-img.is-top {
+  z-index: 4;
 }
 
 .stage-vignette-top {
@@ -92,7 +108,7 @@ body {
   height: 130px;
   background: linear-gradient(180deg, rgba(8, 10, 16, 0.78) 0%, rgba(8, 10, 16, 0) 100%);
   pointer-events: none;
-  z-index: 3;
+  z-index: 5;
 }
 
 .stage-vignette-bottom {
@@ -103,7 +119,7 @@ body {
   height: 250px;
   background: linear-gradient(0deg, rgba(8, 10, 16, 0.9) 0%, rgba(8, 10, 16, 0.35) 55%, rgba(8, 10, 16, 0) 100%);
   pointer-events: none;
-  z-index: 3;
+  z-index: 5;
 }
 
 .tap-catcher {
@@ -257,8 +273,8 @@ body {
   z-index: 25;
   display: none;
   align-items: flex-end;
-  padding: 20px 16px calc(22px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(10, 12, 18, 0.18) 0%, rgba(10, 12, 18, 0.85) 75%);
+  padding: 18px 12px calc(20px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(10, 12, 18, 0.04) 0%, rgba(10, 12, 18, 0.34) 100%);
 }
 
 .overlay-screen.active {
@@ -267,12 +283,12 @@ body {
 
 .start-card {
   width: 100%;
-  background: var(--glass-card);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px);
+  background: rgba(12, 15, 22, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(2px);
   border-radius: 20px;
-  padding: 22px 20px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  padding: 18px 14px;
+  box-shadow: none;
 }
 
 .edu-pill {
@@ -280,35 +296,52 @@ body {
   font-size: 0.74rem;
   font-weight: 700;
   color: #ff9aab;
-  background: var(--accent-soft);
-  border: 1px solid rgba(255, 107, 129, 0.4);
+  background: rgba(255, 107, 129, 0.22);
+  border: 1px solid rgba(255, 107, 129, 0.45);
   padding: 4px 11px;
   border-radius: 999px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
 }
 
 .start-title {
-  font-size: 1.44rem;
+  font-size: clamp(0.92rem, 4.15vw, 1.3rem);
   font-weight: 800;
-  line-height: 1.32;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
   color: #ffffff;
-  margin-bottom: 10px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  margin-bottom: 8px;
 }
 
 .start-simple-guide {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: #eef2f8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  margin-bottom: 12px;
 }
 
 .start-dept-box {
   margin-top: 0;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+  background: rgba(12, 15, 22, 0.44);
+  border-color: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+.start-dept-box .dept-label {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.start-dept-box .dept-select {
+  background: rgba(12, 15, 22, 0.72);
 }
 
 .dept-load-status {
   font-size: 0.74rem;
   color: #ffb3bf;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   margin-top: 6px;
   min-height: 16px;
   line-height: 1.4;
@@ -850,6 +883,81 @@ body {
   font-weight: 700;
   color: #d3f9d8;
   margin-bottom: 10px;
+}
+
+/* Transparent Choice #1 & Two-Step Right Arrow */
+.choice-transparent-card {
+  background: rgba(12, 15, 22, 0.22);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+  padding: 14px;
+}
+
+.choice-transparent-card .sheet-title,
+.choice-transparent-card .sheet-desc,
+.choice-transparent-card .text-back-btn {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.choice-transparent-card .text-back-btn {
+  color: #f1f3f5;
+}
+
+.choice-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.choice-row .choice-btn {
+  flex: 1;
+  min-width: 0;
+  background: rgba(12, 15, 22, 0.54);
+  backdrop-filter: blur(4px);
+}
+
+.choice-row.selected .choice-btn {
+  border-color: var(--accent);
+  background: rgba(255, 107, 129, 0.34);
+}
+
+.choice-row.selected .choice-num {
+  background: var(--accent);
+}
+
+.choice-go-btn {
+  width: 0;
+  min-width: 0;
+  margin-left: 0;
+  padding: 0;
+  border: 0 solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff6b81, #e84366);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: width 0.2s ease, margin-left 0.2s ease, opacity 0.2s ease, transform 0.12s ease;
+}
+
+.choice-row.selected .choice-go-btn {
+  width: 48px;
+  margin-left: 8px;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.28);
+  opacity: 1;
+  pointer-events: auto;
+  box-shadow: 0 6px 16px rgba(232, 67, 102, 0.4);
+}
+
+.choice-row.selected .choice-go-btn:active {
+  transform: scale(0.95);
 }
 
 /* Transparent 4-3 Quiz Card (slimmed so upper face & cycling GIF show clearly) */
