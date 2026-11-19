@@ -661,6 +661,7 @@
   let isAutoPlay = true;
   let typingTimer = null;
   let autoTimer = null;
+  let quizCycleTimer = null;
   let isTyping = false;
   let activeGifUrl = 'gif/Nurses_talking_in_elevator_8afa24f8.gif';
   let lastFloor = '07F';
@@ -763,6 +764,27 @@
     }
   }
 
+  const QUIZ_BG_CYCLE = [
+    'gif/Nurse_looking_at_phone_3937579d.gif',
+    'gif/Nurses_talking_in_elevator_8afa24f8.gif',
+    'gif/Woman_standing_in_elevator_93eec380.gif',
+    'gif/Woman_resting_chin_thoughtfully_1d7844eb.gif'
+  ];
+
+  function startQuizBgCycle() {
+    QUIZ_BG_CYCLE.forEach(preloadGif);
+    let cycleIdx = 0;
+    quizCycleTimer = setInterval(() => {
+      if (currentStepId !== '4-3') {
+        clearInterval(quizCycleTimer);
+        quizCycleTimer = null;
+        return;
+      }
+      cycleIdx = (cycleIdx + 1) % QUIZ_BG_CYCLE.length;
+      setStageGif(QUIZ_BG_CYCLE[cycleIdx]);
+    }, 4000);
+  }
+
   function clearTimers() {
     if (typingTimer) {
       clearInterval(typingTimer);
@@ -771,6 +793,10 @@
     if (autoTimer) {
       clearInterval(autoTimer);
       autoTimer = null;
+    }
+    if (quizCycleTimer) {
+      clearInterval(quizCycleTimer);
+      quizCycleTimer = null;
     }
     isTyping = false;
     if (autoProgressBar) {
@@ -923,6 +949,7 @@
     } else if (step.type === 'quiz' && panelQuiz) {
       renderQuizPanel();
       panelQuiz.classList.add('active');
+      startQuizBgCycle();
     } else if (step.type === 'puzzle' && panelPuzzle) {
       panelPuzzle.classList.add('active');
     } else if (step.type === 'places' && panelPlaces) {

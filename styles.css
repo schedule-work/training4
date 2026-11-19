@@ -852,12 +852,27 @@ body {
   margin-bottom: 10px;
 }
 
-/* Transparent 4-3 Quiz Card so background GIF shows clearly */
+/* Transparent 4-3 Quiz Card (slimmed so upper face & cycling GIF show clearly) */
 .quiz-transparent-card {
   background: rgba(12, 15, 22, 0.22);
   backdrop-filter: blur(2px);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: none;
+  padding: 13px 14px;
+}
+
+.quiz-transparent-card .sheet-header-row {
+  margin-bottom: 4px;
+}
+
+.quiz-transparent-card .sheet-title {
+  font-size: 1.02rem;
+  margin: 4px 0;
+}
+
+.quiz-transparent-card .sheet-desc {
+  font-size: 0.78rem;
+  margin-bottom: 9px;
 }
 
 .quiz-transparent-card .sheet-title,
@@ -870,7 +885,14 @@ body {
   color: #f1f3f5;
 }
 
+.quiz-transparent-card .quiz-options-list {
+  gap: 6px;
+}
+
 .quiz-transparent-card .option-btn {
+  min-height: 40px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
   background: rgba(12, 15, 22, 0.54);
   backdrop-filter: blur(4px);
 }
@@ -878,6 +900,11 @@ body {
 .quiz-transparent-card .option-btn.selected {
   background: rgba(255, 107, 129, 0.34);
   border-color: var(--accent);
+}
+
+.quiz-transparent-card .quiz-status-text {
+  min-height: 14px;
+  margin: 6px 0 4px;
 }
 
 /* ========================================================
