@@ -519,6 +519,9 @@
     if (msg === 'APPS_SCRIPT_HTML_RESPONSE') {
       return '구글 Apps Script에 최신 Code.gs가 배포되지 않았습니다. 새 버전으로 배포 후 다시 시도해 주세요.';
     }
+    if (err && err.name === 'AbortError') {
+      return '응답 대기 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.';
+    }
     return msg || fallbackMsg;
   }
 
@@ -535,16 +538,26 @@
       throw new Error('Apps Script URL이 설정되지 않았습니다.');
     }
     const sep = APPS_SCRIPT_URL.indexOf('?') === -1 ? '?' : '&';
-    const resp = await fetch(`${APPS_SCRIPT_URL}${sep}page=departments`, {
-      method: 'GET',
-      redirect: 'follow'
-    });
-    const text = await resp.text();
-    const json = parseJsonResponseText(text);
-    if (json && json.ok && Array.isArray(json.departments) && json.departments.length > 0) {
-      return json.departments;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    try {
+      const resp = await fetch(`${APPS_SCRIPT_URL}${sep}page=departments`, {
+        method: 'GET',
+        redirect: 'follow',
+        signal: controller ? controller.signal : undefined
+      });
+      if (!resp.ok) {
+        throw new Error(`HTTP_${resp.status}`);
+      }
+      const text = await resp.text();
+      const json = parseJsonResponseText(text);
+      if (json && json.ok && Array.isArray(json.departments) && json.departments.length > 0) {
+        return json.departments;
+      }
+      throw new Error((json && json.error) || '부서 목록이 비어 있습니다.');
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
     }
-    throw new Error((json && json.error) || '부서 목록이 비어 있습니다.');
   }
 
   async function apiPostAction(payload) {
@@ -1141,23 +1154,42 @@
     if (retryDeptBtn) retryDeptBtn.style.display = 'none';
     if (deptLoadStatus) deptLoadStatus.textContent = '구글 시트에서 부서 목록을 불러오는 중입니다.';
 
-    try {
-      const depts = await apiLoadDepartments();
-      populateDepartments(depts);
-    } catch (err) {
-      if (deptSelect) {
-        deptSelect.disabled = true;
-        deptSelect.innerHTML = '<option value="">-- 부서 목록을 불러오지 못했습니다 --</option>';
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAYS = [600, 1400];
+    let lastErr = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const depts = await apiLoadDepartments();
+        populateDepartments(depts);
+        return;
+      } catch (err) {
+        lastErr = err;
+        const msg = err && err.message ? err.message : '';
+        if (window.location.protocol === 'file:' || msg === 'APPS_SCRIPT_HTML_RESPONSE') {
+          break;
+        }
+        if (attempt < MAX_ATTEMPTS) {
+          if (deptLoadStatus) {
+            deptLoadStatus.textContent = `부서 목록을 다시 불러오는 중입니다. (${attempt + 1}/${MAX_ATTEMPTS})`;
+          }
+          await new Promise((r) => setTimeout(r, RETRY_DELAYS[attempt - 1] || 1000));
+        }
       }
-      if (startEduBtn) startEduBtn.disabled = true;
-      if (deptLoadStatus) {
-        deptLoadStatus.textContent = formatApiError(
-          err,
-          "구글 시트 '부서' 목록을 불러오지 못했습니다."
-        );
-      }
-      if (retryDeptBtn) retryDeptBtn.style.display = 'block';
     }
+
+    if (deptSelect) {
+      deptSelect.disabled = true;
+      deptSelect.innerHTML = '<option value="">-- 부서 목록을 불러오지 못했습니다 --</option>';
+    }
+    if (startEduBtn) startEduBtn.disabled = true;
+    if (deptLoadStatus) {
+      deptLoadStatus.textContent = formatApiError(
+        lastErr,
+        "구글 시트 '부서' 목록을 불러오지 못했습니다."
+      );
+    }
+    if (retryDeptBtn) retryDeptBtn.style.display = 'block';
   }
 
   if (retryDeptBtn) {
