@@ -25,6 +25,7 @@
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 html,
@@ -32,6 +33,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  touch-action: manipulation;
   background: #090b10;
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -640,6 +642,7 @@ body {
   max-height: 70dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .scrollable-card.summary-scroll {
@@ -881,9 +884,10 @@ body {
   margin-bottom: 10px;
 }
 
-/* Transparent Choice #1, Puzzle 4-4 & Summary 4-5 Cards */
+/* Transparent Choice #1, Puzzle 4-4, Places 4-4-2 & Summary 4-5 Cards */
 .choice-transparent-card,
 .puzzle-transparent-card,
+.places-transparent-card,
 .summary-transparent-card {
   background: rgba(12, 15, 22, 0.22);
   backdrop-filter: blur(2px);
@@ -895,6 +899,112 @@ body {
 .puzzle-transparent-card {
   background: rgba(12, 15, 22, 0.46);
   backdrop-filter: blur(8px);
+  max-height: 82dvh;
+  padding: 11px 12px;
+}
+
+.puzzle-transparent-card .sheet-header-row {
+  margin-bottom: 3px;
+}
+
+.puzzle-transparent-card .sheet-title {
+  font-size: 0.98rem;
+  margin: 3px 0;
+}
+
+.puzzle-transparent-card .sheet-desc {
+  font-size: 0.75rem;
+  margin-bottom: 7px;
+  line-height: 1.38;
+}
+
+.puzzle-transparent-card .patient-cohort-box {
+  padding: 7px 9px;
+  margin-bottom: 7px;
+  border-radius: 12px;
+}
+
+.puzzle-transparent-card .cohort-header {
+  margin-bottom: 5px;
+}
+
+.puzzle-transparent-card .cohort-title {
+  font-size: 0.72rem;
+}
+
+.puzzle-transparent-card .cohort-count-badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+}
+
+.puzzle-transparent-card .cohort-grid {
+  gap: 4px;
+}
+
+.puzzle-transparent-card .cohort-person {
+  flex-direction: row;
+  gap: 3px;
+  padding: 4px 3px;
+  border-radius: 8px;
+}
+
+.puzzle-transparent-card .cohort-person svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.puzzle-transparent-card .cohort-person-label {
+  font-size: 0.62rem;
+}
+
+.puzzle-transparent-card .puzzle-grid {
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.puzzle-transparent-card .puzzle-card {
+  padding: 6px 18px 6px 7px;
+  gap: 6px;
+  border-radius: 10px;
+  cursor: default;
+}
+
+.puzzle-transparent-card .puzzle-icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+
+.puzzle-transparent-card .puzzle-icon-badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.puzzle-transparent-card .puzzle-cat {
+  font-size: 0.61rem;
+}
+
+.puzzle-transparent-card .puzzle-val {
+  font-size: 0.71rem;
+}
+
+.puzzle-transparent-card .identity-box {
+  padding: 7px 9px;
+  gap: 4px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+}
+
+.puzzle-transparent-card .identity-text {
+  font-size: 0.74rem;
+  line-height: 1.38;
+}
+
+.puzzle-transparent-card .btn-primary {
+  min-height: 40px;
+  padding: 9px 14px;
+  font-size: 0.86rem;
 }
 
 .choice-transparent-card .sheet-title,
@@ -903,6 +1013,9 @@ body {
 .puzzle-transparent-card .sheet-title,
 .puzzle-transparent-card .sheet-desc,
 .puzzle-transparent-card .text-back-btn,
+.places-transparent-card .sheet-title,
+.places-transparent-card .sheet-desc,
+.places-transparent-card .text-back-btn,
 .summary-transparent-card .sheet-title,
 .summary-transparent-card .compare-desc,
 .summary-transparent-card .text-back-btn,
@@ -920,8 +1033,20 @@ body {
 
 .choice-transparent-card .text-back-btn,
 .puzzle-transparent-card .text-back-btn,
+.places-transparent-card .text-back-btn,
 .summary-transparent-card .text-back-btn {
   color: #f1f3f5;
+}
+
+.places-transparent-card .place-card {
+  background: rgba(12, 15, 22, 0.54);
+  backdrop-filter: blur(4px);
+}
+
+.places-transparent-card .legal-highlight {
+  background: rgba(255, 107, 129, 0.24);
+  backdrop-filter: blur(4px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
 }
 
 /* Inner Readability for Transparent Puzzle & Summary Cards */

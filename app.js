@@ -862,6 +862,9 @@
       clearInterval(quizCycleTimer);
       quizCycleTimer = null;
     }
+    if (typeof stopPuzzleAutoPlay === 'function') {
+      stopPuzzleAutoPlay();
+    }
     isTyping = false;
     if (autoProgressBar) {
       autoProgressBar.style.width = '0%';
@@ -1032,6 +1035,7 @@
       startQuizBgCycle();
     } else if (step.type === 'puzzle' && panelPuzzle) {
       panelPuzzle.classList.add('active');
+      startPuzzleAutoPlay();
     } else if (step.type === 'places' && panelPlaces) {
       panelPlaces.classList.add('active');
     } else if (step.type === 'summary' && panelSummary) {
@@ -1576,13 +1580,13 @@
 
     if (identityStatus) {
       if (activeClues.length === 0) {
-        identityStatus.textContent = '단서를 선택할 때마다 조건과 다른 환자가 제외됩니다.';
+        identityStatus.textContent = '대화 속 단서들이 순서대로 연결되며 환자가 좁혀집니다.';
       } else if (isIdentified) {
         identityStatus.textContent =
           '이름을 말하지 않았는데도 선택된 단서들이 결합되어 홍OO 환자 1명으로 특정되었습니다.';
       } else {
         identityStatus.textContent =
-          `조건과 일치하는 후보가 12명에서 ${remaining}명으로 좁혀졌습니다. 단서를 더 눌러보세요.`;
+          `조건과 일치하는 후보가 12명에서 ${remaining}명으로 좁혀졌습니다.`;
       }
     }
 
@@ -1599,7 +1603,16 @@
     }
   }
 
+  let puzzleAutoTimers = [];
+  const PUZZLE_AUTO_SEQUENCE = ['room', 'date', 'guardian', 'test'];
+
+  function stopPuzzleAutoPlay() {
+    puzzleAutoTimers.forEach((tid) => clearTimeout(tid));
+    puzzleAutoTimers = [];
+  }
+
   function resetPuzzle() {
+    stopPuzzleAutoPlay();
     connectedPieces.length = 0;
     document.querySelectorAll('.puzzle-card').forEach((card) => {
       card.classList.remove('connected');
@@ -1607,20 +1620,21 @@
     updateSimulatorUI(true);
   }
 
-  document.querySelectorAll('.puzzle-card').forEach((card) => {
-    card.addEventListener('click', function () {
-      const piece = this.getAttribute('data-piece');
-      const idx = connectedPieces.indexOf(piece);
-      if (idx !== -1) {
-        connectedPieces.splice(idx, 1);
-        this.classList.remove('connected');
-      } else {
-        connectedPieces.push(piece);
-        this.classList.add('connected');
-      }
-      updateSimulatorUI(false);
+  function startPuzzleAutoPlay() {
+    resetPuzzle();
+    PUZZLE_AUTO_SEQUENCE.forEach((piece, idx) => {
+      const tid = setTimeout(() => {
+        if (currentStepId !== '4-4-1') return;
+        const card = document.querySelector(`.puzzle-card[data-piece="${piece}"]`);
+        if (card) card.classList.add('connected');
+        if (connectedPieces.indexOf(piece) === -1) {
+          connectedPieces.push(piece);
+        }
+        updateSimulatorUI(false);
+      }, 650 + idx * 900);
+      puzzleAutoTimers.push(tid);
     });
-  });
+  }
 
   if (puzzleBackBtn) puzzleBackBtn.addEventListener('click', goPrevStep);
   if (toPlacesBtn) {
@@ -1839,5 +1853,9 @@
     updateSimulatorUI(true);
     renderPoll();
     loadDepartmentsFromSheet();
+
+    // Prevent iOS Safari pinch/double-tap zoom gestures
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
   });
 })();
