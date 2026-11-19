@@ -1503,72 +1503,6 @@
     });
   }
 
-  // 6 Caution Places (Non-blocking inline detail)
-  const placeData = {
-    elevator: {
-      title: '엘리베이터: 좁고 밀폐된 공용 공간',
-      risk: '환자, 보호자, 외부 방문객, 타 부서 직원이 함께 탑승하여 대화 소리가 쉽게 들립니다.',
-      caseText: '"302호 할아버지 오늘 수술 결과..."라고 말하는 순간, 옆에 탄 사람이 해당 환자의 직장 동료였던 사례.',
-      rule: '행동 수칙: 엘리베이터 문이 닫히면 환자 관련 대화는 즉시 멈추세요.'
-    },
-    hallway: {
-      title: '병동 및 외래 복도: 이동 중 무심코 나오는 대화',
-      risk: '오픈된 복도는 지나가는 누구나 대화를 들을 수 있으며 차트 화면도 노출되기 쉽습니다.',
-      caseText: '복도를 걸으며 "그 환자분 보호자가 까다롭더라"고 한 말이 병실 앞 보호자에게 들린 사례.',
-      rule: '행동 수칙: 복도 이동 중에는 환자 신상 및 상황에 대한 대화를 삼갑니다.'
-    },
-    lobby: {
-      title: '로비 및 접수처: 다수의 일반 대중이 머무는 곳',
-      risk: '넓은 공간이라 안전하다고 착각하기 쉬우나 수많은 외래 환자와 대기자가 상주합니다.',
-      caseText: '로비에서 동료를 만나 "그 환자분 6층에 입원했더라"고 나눈 대화가 주변에 전달된 사례.',
-      rule: '행동 수칙: 로비에서는 공무 외 사적인 환자 언급을 일체 금지합니다.'
-    },
-    cafeteria: {
-      title: '직원식당: 긴장이 풀리기 쉬운 식사 공간',
-      risk: '편안한 식사 자리에서 회진 및 수술 이야기를 환자 특징과 함께 꺼내기 쉽습니다.',
-      caseText: '옆 테이블의 실습생이나 협력업체 직원에게 환자의 민감한 진료 정보가 전달된 사례.',
-      rule: '행동 수칙: 식사 시간에는 환자 사례에 대한 대화를 삼갑니다.'
-    },
-    cafe: {
-      title: '원내·원외 카페: 외부인이 가장 많은 곳',
-      risk: '퇴원 수속 중인 가족, 면회객, 인근 주민들이 바로 옆 테이블에 앉아 있습니다.',
-      caseText: '카페에서 나눈 대화 속 환자가 옆자리 손님의 지인이어서 원내 민원이 접수된 사례.',
-      rule: '행동 수칙: 카페는 공공장소입니다. 병원 내부 환자 이야기는 꺼내지 않습니다.'
-    },
-    transit: {
-      title: '대중교통 및 퇴근길: 열린 공간',
-      risk: '퇴근 버스나 지하철에서 전화 통화로 병실이나 환자 이야기를 큰 소리로 나누는 경우입니다.',
-      caseText: '마을버스 통화 내용으로 특정 환자의 진단 사실이 동네 주민들에게 알려진 사례.',
-      rule: '행동 수칙: 대중교통 이용 중 업무 관련 통화는 종료하고 사내 메신저를 이용합니다.'
-    }
-  };
-
-  const placeInlineDetail = document.getElementById('placeInlineDetail');
-
-  function renderInlinePlace(placeKey) {
-    const data = placeData[placeKey] || placeData.elevator;
-    document.querySelectorAll('.place-card').forEach((card) => {
-      card.classList.toggle('active', card.getAttribute('data-place') === placeKey);
-    });
-    if (placeInlineDetail) {
-      placeInlineDetail.innerHTML = `
-        <h3 class="inline-place-title">${data.title}</h3>
-        <div class="inline-place-body">
-          <p><strong>위험 요인:</strong> ${data.risk}</p>
-          <p><strong>발생 사례:</strong> ${data.caseText}</p>
-          <p class="inline-place-rule">${data.rule}</p>
-        </div>
-      `;
-    }
-  }
-
-  document.querySelectorAll('.place-card').forEach((card) => {
-    card.addEventListener('click', function () {
-      Sound.tap();
-      renderInlinePlace(this.getAttribute('data-place'));
-    });
-  });
-
   // ==========================================
   // 10. Scene 4-5 Answer Reveal, Dept Stats, Single-Select Poll & Private Feedback
   // ==========================================
@@ -1769,7 +1703,6 @@
     initCohortGrid();
     preloadAhead(STORY_STEPS[0]);
     updateSimulatorUI(true);
-    renderInlinePlace('elevator');
     renderPoll();
     loadDepartmentsFromSheet();
   });

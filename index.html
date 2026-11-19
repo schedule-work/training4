@@ -243,9 +243,9 @@
             <span class="sheet-badge">단편 정보 결합 체험 · 4/5</span>
             <button id="puzzleBackBtn" class="text-back-btn" type="button">이전 장면</button>
           </div>
-          <h2 class="sheet-title">대화 속 조각이 모이면 1명으로 좁혀집니다</h2>
+          <h2 class="sheet-title">작은 정보들이 연결되면 특정 환자가 식별됩니다</h2>
           <p class="sheet-desc">
-            아래 단서를 하나씩 눌러 7층 병동 입원 환자 12명 중 누구로 좁혀지는지 확인해 보세요.
+            대화 속 단서들을 하나씩 선택해, 실명 없이도 환자가 어떻게 특정되는지 확인해 보세요.
           </p>
 
           <!-- 12-Patient Cohort Grid -->
@@ -347,7 +347,7 @@
         </div>
       </div>
 
-      <!-- 6-4. 6 Caution Places (Inline Switch, No Blocking Modal) -->
+      <!-- 6-4. 6 Caution Places (Static Reference Cards + Legal Notice Only) -->
       <div id="panelPlaces" class="sheet-panel">
         <div class="sheet-card scrollable-card">
           <div class="sheet-header-row">
@@ -356,11 +356,11 @@
           </div>
           <h2 class="sheet-title">무심코 말하기 쉬운 6대 주의 공간</h2>
           <p class="sheet-desc">
-            공간을 선택하면 아래에 사례와 수칙이 바로 표시됩니다.
+            밀폐된 공간처럼 느껴지는 엘리베이터 역시 누구나 함께 이용하는 공개된 장소입니다.
           </p>
 
           <div class="places-grid">
-            <button class="place-card active" type="button" data-place="elevator">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="4" y="3" width="16" height="18" rx="2"></rect>
@@ -369,9 +369,9 @@
                 </svg>
               </span>
               <span class="place-name">엘리베이터</span>
-            </button>
+            </div>
 
-            <button class="place-card" type="button" data-place="hallway">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 21h18"></path>
@@ -380,9 +380,9 @@
                 </svg>
               </span>
               <span class="place-name">복도</span>
-            </button>
+            </div>
 
-            <button class="place-card" type="button" data-place="lobby">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 10h18"></path>
@@ -393,9 +393,9 @@
                 </svg>
               </span>
               <span class="place-name">로비</span>
-            </button>
+            </div>
 
-            <button class="place-card" type="button" data-place="cafeteria">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
@@ -404,9 +404,9 @@
                 </svg>
               </span>
               <span class="place-name">직원식당</span>
-            </button>
+            </div>
 
-            <button class="place-card" type="button" data-place="cafe">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -417,9 +417,9 @@
                 </svg>
               </span>
               <span class="place-name">카페</span>
-            </button>
+            </div>
 
-            <button class="place-card" type="button" data-place="transit">
+            <div class="place-card">
               <span class="place-icon-box" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="4" y="3" width="16" height="14" rx="2"></rect>
@@ -431,11 +431,8 @@
                 </svg>
               </span>
               <span class="place-name">대중교통</span>
-            </button>
+            </div>
           </div>
-
-          <!-- Inline Non-Blocking Detail Area -->
-          <div id="placeInlineDetail" class="place-inline-detail" aria-live="polite"></div>
 
           <div class="legal-highlight">
             단편적인 정보라도 다른 정보와 결합되어 환자를 특정할 수 있다면 「개인정보 보호법」상 보호받는 개인정보에 해당합니다.

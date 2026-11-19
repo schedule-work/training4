@@ -1132,13 +1132,13 @@ body {
 }
 
 /* ========================================================
-   7. 6 Caution Places (Non-Blocking Inline Detail)
+   7. 6 Caution Places (Static Reference Grid)
    ======================================================== */
 .places-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .place-card {
@@ -1147,18 +1147,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 6px;
+  padding: 11px 6px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.place-card.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
 }
 
 .place-icon-box {
@@ -1173,57 +1166,20 @@ body {
   justify-content: center;
 }
 
-.place-card.active .place-icon-box {
-  background: var(--accent);
-  color: #ffffff;
-}
-
 .place-name {
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.place-inline-detail {
-  padding: 12px 13px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  margin-bottom: 10px;
-}
-
-.inline-place-title {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #ffffff;
-  margin-bottom: 6px;
-}
-
-.inline-place-body p {
-  font-size: 0.79rem;
-  color: var(--text-secondary);
-  line-height: 1.48;
-  margin-bottom: 5px;
-  word-break: keep-all;
-}
-
-.inline-place-body p:last-child {
-  margin-bottom: 0;
-}
-
-.inline-place-rule {
-  color: #ff9aab !important;
+  font-size: 0.76rem;
   font-weight: 700;
 }
 
 .legal-highlight {
-  font-size: 0.77rem;
+  font-size: 0.8rem;
   color: #ffd0d8;
   background: var(--accent-soft);
-  border: 1px solid rgba(255, 107, 129, 0.35);
-  border-radius: 10px;
-  padding: 9px 11px;
-  margin-bottom: 12px;
-  line-height: 1.45;
+  border: 1px solid rgba(255, 107, 129, 0.4);
+  border-radius: 12px;
+  padding: 11px 13px;
+  margin-bottom: 14px;
+  line-height: 1.5;
   word-break: keep-all;
 }
 
