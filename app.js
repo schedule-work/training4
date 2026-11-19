@@ -189,7 +189,7 @@
       gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '오전 회진이 끝난 뒤였다. 지윤과 동료는 다른 층으로 이동하기 위해 엘리베이터에 탔다.',
+      text: '오전 회진이 끝난 뒤였다.\n지윤과 동료는 다른 층으로 이동하기 위해 엘리베이터에 탔다.',
       holdMs: 3600,
       nextId: '4-1-2'
     },
@@ -254,7 +254,7 @@
       gif: 'webp/Woman_standing_in_elevator_93eec380.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '엘리베이터 한쪽에는 처음 보는 사람이 함께 타고 있었다. 병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
+      text: '엘리베이터 한쪽에는 처음 보는 사람이 함께 타고 있었다.\n병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
       holdMs: 3800,
       nextId: 'choice-1'
     },
@@ -289,7 +289,7 @@
       gif: 'webp/Woman_stepping_out_of_elevator_46d1ab01.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '6층에서 함께 타고 있던 승객이 내렸다. 대화를 멈춘 덕분에 환자의 정보는 전혀 노출되지 않았다.',
+      text: '6층에서 함께 타고 있던 승객이 내렸다.\n대화를 멈춘 덕분에 환자의 정보는 전혀 노출되지 않았다.',
       holdMs: 3800,
       sfx: 'elevatorChime',
       nextId: 'safe-result'
@@ -407,7 +407,7 @@
       gif: 'webp/Nurse_looking_at_phone_3937579d.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
-      text: '"잠깐, 다시 생각해 보자. 실제로 이런 상황이라면 나는 어떻게 행동해야 할까?"',
+      text: '"잠깐, 다시 생각해 보자.\n실제로 이런 상황이라면 나는 어떻게 행동해야 할까?"',
       holdMs: 3500,
       nextId: '4-3'
     },
@@ -429,7 +429,7 @@
       gif: 'webp/Nurse_thinking_at_desk_586b65fc.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '환자 정보는 이름이나 등록번호만을 의미하지 않습니다. 작은 정보들이 모이면 특정 환자를 알아볼 수 있습니다.',
+      text: '환자 정보는 이름이나 등록번호만을 의미하지 않습니다.\n작은 정보들이 모이면 특정 환자를 알아볼 수 있습니다.',
       holdMs: 4000,
       nextId: '4-4-1'
     },
