@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>개인정보보호 4회차 - 어쩌다, 우리만 들을 줄 알았던 이야기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="stageViewport" class="stage-viewport" aria-label="개인정보보호 4회차 참여형 교육 화면">
+    <!-- 1. Locked Full-Screen Video (GIF) Layers -->
+    <img
+      id="gifBackdrop"
+      class="gif-backdrop-img"
+      src="gif/Nurses_talking_in_elevator_8afa24f8.gif"
+      alt=""
+      aria-hidden="true"
+    >
+    <img
+      id="gifStage"
+      class="gif-stage-img"
+      src="gif/Nurses_talking_in_elevator_8afa24f8.gif"
+      alt="교육 장면 애니메이션"
+    >
+
+    <!-- Top & Bottom Readability Vignettes -->
+    <div class="stage-vignette-top" aria-hidden="true"></div>
+    <div class="stage-vignette-bottom" aria-hidden="true"></div>
+
+    <!-- 2. Top Floating HUD -->
+    <header id="hudTop" class="hud-top">
+      <div id="storySegments" class="story-segments" aria-label="교육 진행도"></div>
+
+      <div class="hud-row">
+        <div class="hud-left">
+          <span id="chapterBadge" class="chapter-badge">1/5 도입</span>
+          <span id="floorBadge" class="floor-badge">07F</span>
+        </div>
+
+        <div class="hud-actions">
+          <button id="autoToggleBtn" class="hud-pill-btn active" type="button" aria-pressed="true" title="자동 진행 켜기/끄기">
+            자동 ON
+          </button>
+
+          <button id="soundToggleBtn" class="hud-icon-btn" type="button" aria-pressed="true" aria-label="음향 켜기/끄기" title="음향 켜기/끄기">
+            <svg id="soundOnIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+            <svg id="soundOffIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <button id="restartBtn" class="hud-icon-btn" type="button" aria-label="처음부터 다시 보기" title="처음부터 다시 보기">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 3. Tap-to-Advance Layer -->
+    <div id="tapCatcher" class="tap-catcher" aria-hidden="true"></div>
+
+    <!-- 4. Simplified Intro Start Screen Overlay (Department Required First) -->
+    <section id="startOverlay" class="overlay-screen active" aria-label="교육 시작 안내">
+      <div class="start-card">
+        <span class="edu-pill">개인정보보호 4회차 · 참여형 교육</span>
+        <h1 class="start-title">어쩌다, 우리만 들을 줄<br>알았던 이야기</h1>
+        <p class="start-simple-guide">소속 부서를 먼저 선택한 뒤 시작해 주세요.</p>
+
+        <div class="dept-select-box start-dept-box">
+          <label for="deptSelect" class="dept-label">소속 부서 선택</label>
+          <select id="deptSelect" class="dept-select" disabled>
+            <option value="">-- 부서 목록을 불러오는 중... --</option>
+          </select>
+          <p id="deptLoadStatus" class="dept-load-status" aria-live="polite">구글 시트에서 부서 목록을 불러오는 중입니다.</p>
+          <button id="retryDeptBtn" class="btn-outline retry-dept-btn" type="button" style="display: none;">
+            부서 다시 불러오기
+          </button>
+        </div>
+
+        <button id="startEduBtn" class="btn-primary btn-block" type="button" disabled>
+          교육 시작하기
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 5. Bottom Dialogue / Narration Overlay (Visually Separated) -->
+    <section id="dialogueOverlay" class="dialogue-overlay" aria-live="polite" aria-label="장면 대사 및 설명">
+      <div id="dialogueCard" class="dialogue-card kind-narration">
+        <div class="auto-progress-track" aria-hidden="true">
+          <div id="autoProgressBar" class="auto-progress-bar"></div>
+        </div>
+
+        <div class="dialogue-head">
+          <div class="dialogue-badges">
+            <span id="speakerBadge" class="speaker-badge role-narration">상황 설명</span>
+            <span id="kindBadge" class="kind-badge">설명</span>
+          </div>
+          <span id="beatCounter" class="beat-counter">1 / 25</span>
+        </div>
+
+        <p id="dialogueText" class="dialogue-text"></p>
+
+        <div class="dialogue-controls">
+          <button id="prevBeatBtn" class="mini-nav-btn" type="button">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            이전
+          </button>
+
+          <span id="tapHintText" class="tap-hint-text">화면을 터치하면 다음으로 이동</span>
+
+          <button id="nextBeatBtn" class="mini-nav-btn primary-tint" type="button">
+            다음
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Interactive Overlay Sheet -->
+    <section id="interactiveSheet" class="interactive-sheet" aria-label="참여형 활동 영역">
+      <!-- 6-1. Situation Check #1 (Real Branching Choice) -->
+      <div id="panelChoice1" class="sheet-panel">
+        <div class="sheet-card">
+          <div class="sheet-header-row">
+            <span class="sheet-badge">상황 판단</span>
+            <button id="choice1BackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+          <h2 class="sheet-title">잠깐, 나라면 어떻게 할까요?</h2>
+          <p class="sheet-desc">
+            엘리베이터 안에 처음 보는 승객이 함께 타고 있습니다. 선택에 따라 이후 상황이 다르게 전개됩니다.
+          </p>
+
+          <div id="choice1Options" class="choice-list">
+            <button class="choice-btn" type="button" data-choice="continue">
+              <span class="choice-num">1</span>
+              <span class="choice-label">환자 실명은 말하지 않았으니 대화를 이어간다.</span>
+            </button>
+            <button class="choice-btn" type="button" data-choice="pause">
+              <span class="choice-num">2</span>
+              <span class="choice-label">타인이 타고 있으므로 대화를 멈추고 내린 뒤에 이야기한다.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-1B. Model Response Branch End Card -->
+      <div id="panelSafeResult" class="sheet-panel">
+        <div class="sheet-card">
+          <div class="sheet-header-row">
+            <span class="sheet-badge badge-success">모범 대처 결과</span>
+            <button id="safeResultBackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+          <h2 class="sheet-title">안전하게 환자 정보를 지켰습니다</h2>
+          <p class="sheet-desc">
+            공개된 공간에서 대화를 즉시 멈추어 외부인에게 어떤 단서도 노출되지 않았습니다.
+            그렇다면 만약 대화를 멈추지 않고 계속했을 때는 어떤 일이 벌어졌을까요?
+          </p>
+
+          <div class="branch-actions">
+            <button id="watchRiskBranchBtn" class="btn-primary btn-block" type="button">
+              만약 대화를 계속했다면? (위험 사례 확인)
+            </button>
+            <button id="skipToQuizBtn" class="btn-outline btn-block" type="button">
+              바로 다음 질문으로 이동
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-2. Core Quiz (Scene 4-3: Transparent Card, Reveal Answer at 4-5) -->
+      <div id="panelQuiz" class="sheet-panel">
+        <div class="sheet-card scrollable-card quiz-transparent-card">
+          <div class="sheet-header-row">
+            <div class="quiz-header-badges">
+              <span class="sheet-badge">나의 선택 · 3/5</span>
+              <span id="quizDeptPill" class="quiz-dept-pill"></span>
+            </div>
+            <button id="quizBackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+          <h2 class="sheet-title">실제로 이런 상황이라면 어떻게 행동할 것 같나요?</h2>
+          <p class="sheet-desc">
+            답변을 선택하고 제출해 주세요. 선택하지 않으면 답변이 기록되지 않으며, 정답은 마지막 단계에서 확인합니다.
+          </p>
+
+          <div id="quizOptionsList" class="quiz-options-list">
+            <button class="option-btn" type="button" data-key="A">
+              <span class="option-key">A</span>
+              <span class="option-text">환자 실명을 말하지 않았으니 대화를 계속한다.</span>
+            </button>
+            <button class="option-btn" type="button" data-key="B">
+              <span class="option-key">B</span>
+              <span class="option-text">목소리를 최대한 낮춰 말하면 괜찮다고 생각한다.</span>
+            </button>
+            <button class="option-btn" type="button" data-key="C">
+              <span class="option-key">C</span>
+              <span class="option-text">의료진 간의 정당한 업무 대화이므로 계속 진행한다.</span>
+            </button>
+            <button class="option-btn" type="button" data-key="D">
+              <span class="option-key">D</span>
+              <span class="option-text">공개된 장소이므로 대화를 멈추고 장소를 옮긴다.</span>
+            </button>
+            <button class="option-btn" type="button" data-key="E">
+              <span class="option-key">E</span>
+              <span class="option-text">주변 사람들이 병원 직원인지 먼저 확인해 본다.</span>
+            </button>
+          </div>
+
+          <div id="quizAlreadyDoneBox" class="quiz-already-box" style="display: none;">
+            <p id="quizAlreadyDoneText" class="quiz-already-text"></p>
+            <button id="quizContinueBtn" class="btn-primary btn-block" type="button">
+              다음 단계로 계속하기
+            </button>
+          </div>
+
+          <p id="quizStatusText" class="quiz-status-text" aria-live="polite"></p>
+
+          <button id="quizSubmitBtn" class="btn-primary btn-block" type="button" disabled>
+            선택 제출하고 다음으로
+          </button>
+        </div>
+      </div>
+
+      <!-- 6-3. Intuitive 12-Patient Elimination Board (Scene 4-4 Part 1) -->
+      <div id="panelPuzzle" class="sheet-panel">
+        <div class="sheet-card scrollable-card">
+          <div class="sheet-header-row">
+            <span class="sheet-badge">단편 정보 결합 체험 · 4/5</span>
+            <button id="puzzleBackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+          <h2 class="sheet-title">대화 속 조각이 모이면 1명으로 좁혀집니다</h2>
+          <p class="sheet-desc">
+            아래 단서를 하나씩 눌러 7층 병동 입원 환자 12명 중 누구로 좁혀지는지 확인해 보세요.
+          </p>
+
+          <!-- 12-Patient Cohort Grid -->
+          <div class="patient-cohort-box">
+            <div class="cohort-header">
+              <span class="cohort-title">7층 병동 입원 환자 현황</span>
+              <span id="cohortCountBadge" class="cohort-count-badge">후보 12명</span>
+            </div>
+            <div id="patientCohortGrid" class="cohort-grid" aria-label="입원 환자 후보 12명"></div>
+          </div>
+
+          <!-- 4 Clues Linked to Elevator Dialogue -->
+          <div class="puzzle-grid">
+            <button class="puzzle-card" type="button" data-piece="room">
+              <span class="puzzle-icon-badge tone-room" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+                  <path d="M3 21h18"></path>
+                  <rect x="9" y="7" width="6" height="4" rx="1"></rect>
+                </svg>
+              </span>
+              <div class="puzzle-meta">
+                <span class="puzzle-cat">대화 언급</span>
+                <span class="puzzle-val">701호 병실</span>
+              </div>
+              <span class="puzzle-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+            </button>
+
+            <button class="puzzle-card" type="button" data-piece="date">
+              <span class="puzzle-icon-badge tone-date" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+              <div class="puzzle-meta">
+                <span class="puzzle-cat">입원 정보</span>
+                <span class="puzzle-val">5월 22일 입원</span>
+              </div>
+              <span class="puzzle-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+            </button>
+
+            <button class="puzzle-card" type="button" data-piece="guardian">
+              <span class="puzzle-icon-badge tone-guardian" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </span>
+              <div class="puzzle-meta">
+                <span class="puzzle-cat">대화 언급</span>
+                <span class="puzzle-val">모녀 보호자 동행</span>
+              </div>
+              <span class="puzzle-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+            </button>
+
+            <button class="puzzle-card" type="button" data-piece="test">
+              <span class="puzzle-icon-badge tone-test" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="8" y1="13" x2="16" y2="13"></line>
+                  <line x1="8" y1="17" x2="13" y2="17"></line>
+                </svg>
+              </span>
+              <div class="puzzle-meta">
+                <span class="puzzle-cat">대화 언급</span>
+                <span class="puzzle-val">CT 이상 소견</span>
+              </div>
+              <span class="puzzle-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+            </button>
+          </div>
+
+          <div id="identityCard" class="identity-box">
+            <div class="identity-top-row">
+              <span id="identityTag" class="identity-tag">12명</span>
+              <div id="assembledClues" class="assembled-clues"></div>
+            </div>
+            <p id="identityStatus" class="identity-text">
+              단서를 선택할 때마다 조건과 다른 환자가 제외됩니다.
+            </p>
+          </div>
+
+          <button id="toPlacesBtn" class="btn-primary btn-block" type="button">
+            공개된 주의 공간 확인하기
+          </button>
+        </div>
+      </div>
+
+      <!-- 6-4. 6 Caution Places (Inline Switch, No Blocking Modal) -->
+      <div id="panelPlaces" class="sheet-panel">
+        <div class="sheet-card scrollable-card">
+          <div class="sheet-header-row">
+            <span class="sheet-badge">주의 공간 확인 · 4/5</span>
+            <button id="placesBackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+          <h2 class="sheet-title">무심코 말하기 쉬운 6대 주의 공간</h2>
+          <p class="sheet-desc">
+            공간을 선택하면 아래에 사례와 수칙이 바로 표시됩니다.
+          </p>
+
+          <div class="places-grid">
+            <button class="place-card active" type="button" data-place="elevator">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                  <line x1="12" y1="8" x2="12" y2="21"></line>
+                  <polyline points="9 6 12 4 15 6"></polyline>
+                </svg>
+              </span>
+              <span class="place-name">엘리베이터</span>
+            </button>
+
+            <button class="place-card" type="button" data-place="hallway">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 21h18"></path>
+                  <path d="M5 21V5l7-2 7 2v16"></path>
+                  <path d="M9 21v-8h6v8"></path>
+                </svg>
+              </span>
+              <span class="place-name">복도</span>
+            </button>
+
+            <button class="place-card" type="button" data-place="lobby">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 10h18"></path>
+                  <path d="M5 10v10"></path>
+                  <path d="M19 10v10"></path>
+                  <path d="M12 3l9 7H3l9-7z"></path>
+                  <path d="M2 20h20"></path>
+                </svg>
+              </span>
+              <span class="place-name">로비</span>
+            </button>
+
+            <button class="place-card" type="button" data-place="cafeteria">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                  <path d="M7 2v20"></path>
+                  <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                </svg>
+              </span>
+              <span class="place-name">직원식당</span>
+            </button>
+
+            <button class="place-card" type="button" data-place="cafe">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                  <line x1="6" y1="2" x2="6" y2="4"></line>
+                  <line x1="10" y1="2" x2="10" y2="4"></line>
+                  <line x1="14" y1="2" x2="14" y2="4"></line>
+                </svg>
+              </span>
+              <span class="place-name">카페</span>
+            </button>
+
+            <button class="place-card" type="button" data-place="transit">
+              <span class="place-icon-box" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="14" rx="2"></rect>
+                  <path d="M4 11h16"></path>
+                  <path d="M8 17l-1 3"></path>
+                  <path d="M16 17l1 3"></path>
+                  <circle cx="8" cy="14" r="1"></circle>
+                  <circle cx="16" cy="14" r="1"></circle>
+                </svg>
+              </span>
+              <span class="place-name">대중교통</span>
+            </button>
+          </div>
+
+          <!-- Inline Non-Blocking Detail Area -->
+          <div id="placeInlineDetail" class="place-inline-detail" aria-live="polite"></div>
+
+          <div class="legal-highlight">
+            단편적인 정보라도 다른 정보와 결합되어 환자를 특정할 수 있다면 「개인정보 보호법」상 보호받는 개인정보에 해당합니다.
+          </div>
+
+          <button id="toSummaryBtn" class="btn-primary btn-block" type="button">
+            정답 확인 및 의견 남기기
+          </button>
+        </div>
+      </div>
+
+      <!-- 6-5. Final Answer Reveal, Dept Stats, Single-Select Poll & Private Anonymous Feedback -->
+      <div id="panelSummary" class="sheet-panel">
+        <div class="sheet-card scrollable-card summary-scroll">
+          <div class="sheet-header-row">
+            <span class="sheet-badge">정답 및 의견 제출 · 5/5</span>
+            <button id="summaryBackBtn" class="text-back-btn" type="button">이전 장면</button>
+          </div>
+
+          <!-- Answer Reveal & My Submission Comparison -->
+          <div id="answerCompareCard" class="answer-compare-card">
+            <div class="compare-badges">
+              <span id="submittedAnsChip" class="compare-chip">내가 제출한 답: -</span>
+              <span class="compare-chip is-official">정답: D</span>
+            </div>
+            <h2 class="sheet-title">정답은 D: 공개 장소에서는 대화 중단</h2>
+            <p id="compareSummaryText" class="compare-desc">
+              공개된 공간에서는 즉시 환자 관련 대화를 멈추고, 의무기록실·스테이션 등 비공개 업무 공간으로 옮겨 대화해야 합니다.
+            </p>
+          </div>
+
+          <!-- Department Quiz Statistics (From 4회차_응답) -->
+          <div id="deptStatsBox" class="dept-stats-box">
+            <div class="dept-stats-head">
+              <h3 id="deptStatsTitle" class="activity-title">소속 부서 참여 현황</h3>
+              <span id="deptStatsCount" class="dept-stats-count">집계 중</span>
+            </div>
+            <div id="deptStatsBars" class="dept-stats-bars"></div>
+          </div>
+
+          <div class="rules-list">
+            <div class="rule-item">
+              <span class="rule-num">1</span>
+              <div class="rule-text">
+                <strong>이름이 아니더라도:</strong> 단편적인 정보들이 모여 특정 환자를 유추할 수 있어 주의가 필요합니다.
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-num">2</span>
+              <div class="rule-text">
+                <strong>열린 공간의 위험:</strong> 엘리베이터, 복도, 카페 등은 누구나 대화 내용을 들을 수 있는 열린 공간입니다.
+              </div>
+            </div>
+            <div class="rule-item">
+              <span class="rule-num">3</span>
+              <div class="rule-text">
+                <strong>업무 대화라도 주의:</strong> 의료진 간의 일상적인 업무 대화 역시 환자 정보 노출로 이어질 수 있음을 항상 유의해야 합니다.
+              </div>
+            </div>
+          </div>
+
+          <!-- Single-Select Question (100% Matched to FEEDBACK_OPTIONS.SCENE04) -->
+          <div class="activity-block">
+            <h3 class="activity-title">함께 생각해 볼 질문</h3>
+            <p class="activity-sub">병원에서 업무 이야기가 무심코 나오기 쉬운 장소는 어디라고 생각하나요? (1개 선택)</p>
+            <div id="pollOptionsGrid" class="poll-options-grid"></div>
+          </div>
+
+          <!-- Private Anonymous Story Submission (Other users' posts NEVER displayed) -->
+          <div class="activity-block">
+            <h3 class="activity-title">익명 이야기 남기기</h3>
+            <p class="activity-sub">
+              "업무 이야기니까 괜찮겠지"라고 생각하기 쉬웠던 순간이나 원내에서 발생할 수 있는 상황을 남겨 주세요. 작성 내용은 관리자 취합용으로만 안전하게 전송되며 다른 참여자에게 공개되지 않습니다.
+            </p>
+            <div class="wall-input-box">
+              <textarea id="wallInput" class="wall-textarea" placeholder="경험이나 의견을 입력해 주세요 (선택 사항 · 익명 보장)"></textarea>
+              <p id="feedbackStatusText" class="quiz-status-text" aria-live="polite"></p>
+              <button id="submitFeedbackBtn" class="btn-primary btn-block" type="button">
+                의견 제출하기
+              </button>
+            </div>
+            <div id="feedbackDoneBanner" class="feedback-done-banner" style="display: none;">
+              소중한 의견이 익명으로 안전하게 제출되었습니다. 참여해 주셔서 감사합니다.
+            </div>
+          </div>
+
+          <button id="finishRestartBtn" class="btn-outline btn-block finish-restart-btn" type="button">
+            처음부터 다시 보기
+          </button>
+
+          <footer class="legal-footer">
+            「의료법」 제19조 및 「개인정보 보호법」 제18조에 따라 개방된 공간에서의 환자 관련 대화에 각별한 주의가 필요합니다.
+          </footer>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

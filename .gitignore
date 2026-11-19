@@ -1,0 +1,15 @@
+# Google Apps Script & 관리자 비밀키 포함 폴더 (GitHub 공개 저장소 업로드 제외)
+1회차-APPS/
+4회차-APPS/
+
+# 사용하지 않는 이미지·영상·작업 파일
+assets/
+my-ai-video/
+.claude/
+legacy.html
+VIDEOFX_PROMPT_GUIDE.md
+장면4-*.png
+gif/Woman_standing_in_elevator_93eec380 (1).gif
+
+.DS_Store
+Thumbs.db
