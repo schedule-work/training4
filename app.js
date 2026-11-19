@@ -186,7 +186,7 @@
       kind: 'narration',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Nurses_talking_in_elevator_8afa24f8.gif',
+      gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '오전 회진이 끝난 뒤였다. 지윤과 동료는 다른 층으로 이동하기 위해 엘리베이터에 탔다.',
@@ -199,7 +199,7 @@
       kind: 'speech',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Nurses_talking_in_elevator_8afa24f8.gif',
+      gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"아까 701호 환자 말이야."',
@@ -212,7 +212,7 @@
       kind: 'speech',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Nurses_talking_in_elevator_8afa24f8.gif',
+      gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
       speaker: '동료 간호사',
       role: 'colleague',
       text: '"응, 보호자랑 이야기하는데 조금 힘들었어."',
@@ -225,7 +225,7 @@
       kind: 'narration',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Nurses_talking_in_elevator_771bf125.gif',
+      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '둘은 방금 전 담당했던 환자 이야기를 자연스럽게 이어갔다.',
@@ -238,7 +238,7 @@
       kind: 'speech',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Nurses_talking_in_elevator_771bf125.gif',
+      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
       speaker: '동료 간호사',
       role: 'colleague',
       text: '"검사 결과 생각보다 안 좋다고 하던데..."',
@@ -251,7 +251,7 @@
       kind: 'narration',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Woman_standing_in_elevator_93eec380.gif',
+      gif: 'webp/Woman_standing_in_elevator_93eec380.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '엘리베이터 한쪽에는 처음 보는 사람이 함께 타고 있었다. 병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
@@ -263,7 +263,7 @@
       type: 'choice1',
       chapter: 1,
       floor: '07F',
-      gif: 'gif/Woman_standing_in_elevator_93eec380.gif'
+      gif: 'webp/Woman_standing_in_elevator_93eec380.webp'
     },
 
     // Branch A: 모범 대처 분기
@@ -273,7 +273,7 @@
       kind: 'speech',
       chapter: 2,
       floor: '07F',
-      gif: 'gif/Nurse_nodding_in_elevator_1edc08f8.gif',
+      gif: 'webp/Nurse_nodding_in_elevator_1edc08f8.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"잠깐, 우리 엘리베이터 안이니까 내린 뒤에 조용한 곳에서 이야기하자."',
@@ -286,7 +286,7 @@
       kind: 'narration',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Woman_stepping_out_of_elevator_46d1ab01.gif',
+      gif: 'webp/Woman_stepping_out_of_elevator_46d1ab01.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '6층에서 함께 타고 있던 승객이 내렸다. 대화를 멈춘 덕분에 환자의 정보는 전혀 노출되지 않았다.',
@@ -299,7 +299,7 @@
       type: 'safeResult',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Nurse_raising_index_finger_13f6be98.gif'
+      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp'
     },
 
     // Branch B: 위험 시나리오 - 장면 4-2
@@ -309,7 +309,7 @@
       kind: 'narration',
       chapter: 2,
       floor: '07F',
-      gif: 'gif/Nurses_whispering_in_elevator_681480a8.gif',
+      gif: 'webp/Nurses_whispering_in_elevator_681480a8.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '동료가 작은 목소리로 속삭이듯 말했다.',
@@ -322,7 +322,7 @@
       kind: 'speech',
       chapter: 2,
       floor: '07F',
-      gif: 'gif/Nurses_whispering_in_elevator_681480a8.gif',
+      gif: 'webp/Nurses_whispering_in_elevator_681480a8.webp',
       speaker: '동료 간호사',
       role: 'colleague',
       text: '"이름도 말 안 했는데 이 정도는 괜찮지 않을까?"',
@@ -335,7 +335,7 @@
       kind: 'narration',
       chapter: 2,
       floor: '07F',
-      gif: 'gif/Nurse_nodding_in_elevator_1edc08f8.gif',
+      gif: 'webp/Nurse_nodding_in_elevator_1edc08f8.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '지윤도 별다른 생각 없이 고개를 끄덕였다.',
@@ -348,7 +348,7 @@
       kind: 'narration',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Woman_stepping_out_of_elevator_46d1ab01.gif',
+      gif: 'webp/Woman_stepping_out_of_elevator_46d1ab01.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '다음 층에서 함께 있던 그 사람이 내리며 휴대전화를 꺼냈다.',
@@ -362,7 +362,7 @@
       kind: 'thought',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Woman_looking_at_phone_61aff9d5.gif',
+      gif: 'webp/Woman_looking_at_phone_61aff9d5.webp',
       speaker: '탑승객',
       role: 'passenger',
       text: '"그 병실이면 혹시…."',
@@ -375,7 +375,7 @@
       kind: 'narration',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Woman_standing_in_elevator_92ed84d2.gif',
+      gif: 'webp/Woman_standing_in_elevator_92ed84d2.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '그때, 지윤은 문득 생각했다.',
@@ -389,7 +389,7 @@
       kind: 'thought',
       chapter: 2,
       floor: '06F',
-      gif: 'gif/Woman_resting_chin_thoughtfully_1d7844eb.gif',
+      gif: 'webp/Woman_resting_chin_thoughtfully_1d7844eb.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"병실 번호, 검사 결과, 보호자 상황만으로도 누군가는 누구의 이야기인지 알아챌 수 있다는 것을…!"',
@@ -404,7 +404,7 @@
       kind: 'thought',
       chapter: 3,
       floor: '06F',
-      gif: 'gif/Nurse_looking_at_phone_3937579d.gif',
+      gif: 'webp/Nurse_looking_at_phone_3937579d.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"잠깐, 다시 생각해 보자. 실제로 이런 상황이라면 나는 어떻게 행동해야 할까?"',
@@ -416,7 +416,7 @@
       type: 'quiz',
       chapter: 3,
       floor: '06F',
-      gif: 'gif/Nurse_looking_at_phone_3937579d.gif'
+      gif: 'webp/Nurse_looking_at_phone_3937579d.webp'
     },
 
     // Chapter 4: 장면 4-4
@@ -426,7 +426,7 @@
       kind: 'narration',
       chapter: 4,
       floor: '06F',
-      gif: 'gif/Nurse_thinking_at_desk_586b65fc.gif',
+      gif: 'webp/Nurse_thinking_at_desk_586b65fc.webp',
       speaker: '상황 설명',
       role: 'narration',
       text: '환자 정보는 이름이나 등록번호만을 의미하지 않습니다. 작은 정보들이 모이면 특정 환자를 알아볼 수 있습니다.',
@@ -438,7 +438,7 @@
       type: 'puzzle',
       chapter: 4,
       floor: '06F',
-      gif: 'gif/Nurse_thinking_at_desk_586b65fc.gif'
+      gif: 'webp/Nurse_thinking_at_desk_586b65fc.webp'
     },
     {
       id: '4-4-2-intro',
@@ -446,7 +446,7 @@
       kind: 'speech',
       chapter: 4,
       floor: '06F',
-      gif: 'gif/Nurse_raising_index_finger_13f6be98.gif',
+      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"밀폐된 공간처럼 느껴지는 엘리베이터 역시 누구나 함께 이용하는 공개된 장소임을 잊지 말아야 합니다."',
@@ -458,7 +458,7 @@
       type: 'places',
       chapter: 4,
       floor: '06F',
-      gif: 'gif/Nurse_raising_index_finger_13f6be98.gif'
+      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp'
     },
 
     // Chapter 5: 장면 4-5
@@ -468,7 +468,7 @@
       kind: 'speech',
       chapter: 5,
       floor: '06F',
-      gif: 'gif/Nurse_raising_index_finger_13f6be98.gif',
+      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
       text: '"이제 내가 선택한 답변과 정답을 확인하고, 현장에서 느낀 점을 함께 나누어 주세요."',
@@ -480,7 +480,7 @@
       type: 'summary',
       chapter: 5,
       floor: '06F',
-      gif: 'gif/Nurse_raising_index_finger_13f6be98.gif'
+      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp'
     }
   ];
 
@@ -663,7 +663,7 @@
   let autoTimer = null;
   let quizCycleTimer = null;
   let isTyping = false;
-  let activeGifUrl = 'gif/Nurses_talking_in_elevator_8afa24f8.gif';
+  let activeGifUrl = 'webp/Nurses_talking_in_elevator_8afa24f8.webp';
   let lastFloor = '07F';
 
   // Participation state
@@ -765,10 +765,10 @@
   }
 
   const QUIZ_BG_CYCLE = [
-    'gif/Nurse_looking_at_phone_3937579d.gif',
-    'gif/Nurses_talking_in_elevator_8afa24f8.gif',
-    'gif/Woman_standing_in_elevator_93eec380.gif',
-    'gif/Woman_resting_chin_thoughtfully_1d7844eb.gif'
+    'webp/Nurse_looking_at_phone_3937579d.webp',
+    'webp/Nurses_talking_in_elevator_8afa24f8.webp',
+    'webp/Woman_standing_in_elevator_93eec380.webp',
+    'webp/Woman_resting_chin_thoughtfully_1d7844eb.webp'
   ];
 
   function startQuizBgCycle() {
