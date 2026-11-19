@@ -463,19 +463,6 @@
 
     // Chapter 5: 장면 4-5
     {
-      id: '4-5-intro',
-      type: 'dialogue',
-      kind: 'speech',
-      chapter: 5,
-      floor: '06F',
-      gif: 'webp/Nurse_raising_index_finger_13f6be98.webp',
-      speaker: '지윤 간호사',
-      role: 'jiyun',
-      text: '"이제 내가 선택한 답변과 정답을 확인하고, 현장에서 느낀 점을 함께 나누어 주세요."',
-      holdMs: 3600,
-      nextId: '4-5'
-    },
-    {
       id: '4-5',
       type: 'summary',
       chapter: 5,
@@ -1646,7 +1633,7 @@
   if (toSummaryBtn) {
     toSummaryBtn.addEventListener('click', function () {
       Sound.tap();
-      navigateTo('4-5-intro', true);
+      navigateTo('4-5', true);
     });
   }
 

@@ -875,8 +875,10 @@ body {
   margin-bottom: 10px;
 }
 
-/* Transparent Choice #1 & Two-Step Right Arrow */
-.choice-transparent-card {
+/* Transparent Choice #1, Puzzle 4-4 & Summary 4-5 Cards */
+.choice-transparent-card,
+.puzzle-transparent-card,
+.summary-transparent-card {
   background: rgba(12, 15, 22, 0.22);
   backdrop-filter: blur(2px);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -886,12 +888,60 @@ body {
 
 .choice-transparent-card .sheet-title,
 .choice-transparent-card .sheet-desc,
-.choice-transparent-card .text-back-btn {
+.choice-transparent-card .text-back-btn,
+.puzzle-transparent-card .sheet-title,
+.puzzle-transparent-card .sheet-desc,
+.puzzle-transparent-card .text-back-btn,
+.summary-transparent-card .sheet-title,
+.summary-transparent-card .compare-desc,
+.summary-transparent-card .text-back-btn,
+.summary-transparent-card .activity-title,
+.summary-transparent-card .activity-sub,
+.summary-transparent-card .legal-footer {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
-.choice-transparent-card .text-back-btn {
+.choice-transparent-card .text-back-btn,
+.puzzle-transparent-card .text-back-btn,
+.summary-transparent-card .text-back-btn {
   color: #f1f3f5;
+}
+
+/* Inner Readability for Transparent Puzzle & Summary Cards */
+.puzzle-transparent-card .patient-cohort-box,
+.puzzle-transparent-card .puzzle-card,
+.puzzle-transparent-card .identity-box {
+  background: rgba(12, 15, 22, 0.54);
+  backdrop-filter: blur(4px);
+}
+
+.puzzle-transparent-card .puzzle-card.connected {
+  background: rgba(255, 107, 129, 0.34);
+}
+
+.puzzle-transparent-card .identity-box.alert-active {
+  background: rgba(255, 82, 82, 0.36);
+}
+
+.summary-transparent-card .answer-compare-card {
+  background: rgba(14, 42, 28, 0.56);
+  backdrop-filter: blur(4px);
+}
+
+.summary-transparent-card .dept-stats-box,
+.summary-transparent-card .rule-item,
+.summary-transparent-card .activity-block,
+.summary-transparent-card .poll-item {
+  background: rgba(12, 15, 22, 0.54);
+  backdrop-filter: blur(4px);
+}
+
+.summary-transparent-card .poll-item.checked {
+  background: rgba(255, 107, 129, 0.34);
+}
+
+.summary-transparent-card .legal-footer {
+  color: #d5dce6;
 }
 
 .choice-row {
