@@ -352,7 +352,7 @@
       speaker: '상황 설명',
       role: 'narration',
       text: '다음 층에서 함께 있던 그 사람이 내리며 휴대전화를 꺼냈다.',
-      holdMs: 3500,
+      holdMs: 4400,
       sfx: 'elevatorChime',
       nextId: '4-2-5'
     },
@@ -747,8 +747,25 @@
         }
       }
     }
-    if (step.id === 'choice-1' || step.id.startsWith('safe-')) {
-      ['safe-1', 'safe-2', 'safe-result', '4-2-1', '4-3-intro', '4-3'].forEach((targetId) => {
+    if (
+      step.id === '4-1-5' ||
+      step.id === '4-1-6' ||
+      step.id === 'choice-1' ||
+      step.id.startsWith('safe-')
+    ) {
+      [
+        'safe-1',
+        'safe-2',
+        'safe-result',
+        '4-2-1',
+        '4-2-3',
+        '4-2-4',
+        '4-2-5',
+        '4-2-6',
+        '4-2-7',
+        '4-3-intro',
+        '4-3'
+      ].forEach((targetId) => {
         const targetStep = getStepById(targetId);
         if (targetStep) preloadGif(targetStep.gif);
       });
@@ -778,35 +795,50 @@
   }
 
   let layerRetireTimer = null;
+  let isStageReadyForCurrentStep = true;
+  let activeStageReadyPromise = Promise.resolve();
 
   function setStageGif(url) {
-    if (!url || activeGifUrl === url) return;
+    if (!url || activeGifUrl === url) {
+      isStageReadyForCurrentStep = true;
+      activeStageReadyPromise = Promise.resolve();
+      return activeStageReadyPromise;
+    }
     activeGifUrl = url;
     const seq = ++stageLoadSeq;
     const nextIdx = activeLayerIdx === 0 ? 1 : 0;
     const currStage = gifStageLayers[activeLayerIdx];
     const nextStage = gifStageLayers[nextIdx];
 
-    if (!currStage || !nextStage) return;
+    if (!currStage || !nextStage) {
+      isStageReadyForCurrentStep = true;
+      activeStageReadyPromise = Promise.resolve();
+      return activeStageReadyPromise;
+    }
 
-    waitImageReady(nextStage, url, seq).then((ready) => {
-      if (!ready || seq !== stageLoadSeq) return;
-      if (layerRetireTimer) {
-        clearTimeout(layerRetireTimer);
-        layerRetireTimer = null;
-      }
-      currStage.classList.remove('is-top');
-      nextStage.classList.add('is-top', 'is-visible');
-      activeLayerIdx = nextIdx;
-      if (gifBackdrop) {
-        gifBackdrop.src = url;
-      }
+    isStageReadyForCurrentStep = false;
+    activeStageReadyPromise = waitImageReady(nextStage, url, seq).then((ready) => {
+      if (seq !== stageLoadSeq) return;
+      if (ready) {
+        if (layerRetireTimer) {
+          clearTimeout(layerRetireTimer);
+          layerRetireTimer = null;
+        }
+        currStage.classList.remove('is-top');
+        nextStage.classList.add('is-top', 'is-visible');
+        activeLayerIdx = nextIdx;
+        if (gifBackdrop) {
+          gifBackdrop.src = url;
+        }
 
-      layerRetireTimer = setTimeout(() => {
-        if (seq !== stageLoadSeq) return;
-        currStage.classList.remove('is-visible');
-      }, 240);
+        layerRetireTimer = setTimeout(() => {
+          if (seq !== stageLoadSeq) return;
+          currStage.classList.remove('is-visible');
+        }, 240);
+      }
+      isStageReadyForCurrentStep = true;
     });
+    return activeStageReadyPromise;
   }
 
   const QUIZ_BG_CYCLE = [
@@ -866,26 +898,41 @@
       return;
     }
 
-    const duration = step.holdMs || 3500;
-    const startAt = Date.now();
-    autoTimer = setInterval(() => {
-      if (!isAutoPlay) {
+    const targetStepId = step.id;
+    const beginCountdown = () => {
+      if (!isAutoPlay || currentStepId !== targetStepId || isTyping) return;
+      if (autoTimer) {
         clearInterval(autoTimer);
         autoTimer = null;
-        if (autoProgressBar) autoProgressBar.style.width = '0%';
-        return;
       }
-      const elapsed = Date.now() - startAt;
-      const pct = Math.min(100, (elapsed / duration) * 100);
-      if (autoProgressBar) {
-        autoProgressBar.style.width = `${pct}%`;
-      }
-      if (elapsed >= duration) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-        goNextStep();
-      }
-    }, 50);
+      const duration = step.holdMs || 3500;
+      const startAt = Date.now();
+      autoTimer = setInterval(() => {
+        if (!isAutoPlay || currentStepId !== targetStepId) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          if (autoProgressBar) autoProgressBar.style.width = '0%';
+          return;
+        }
+        const elapsed = Date.now() - startAt;
+        const pct = Math.min(100, (elapsed / duration) * 100);
+        if (autoProgressBar) {
+          autoProgressBar.style.width = `${pct}%`;
+        }
+        if (elapsed >= duration) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          goNextStep();
+        }
+      }, 50);
+    };
+
+    if (isStageReadyForCurrentStep) {
+      beginCountdown();
+    } else {
+      if (autoProgressBar) autoProgressBar.style.width = '0%';
+      activeStageReadyPromise.then(beginCountdown);
+    }
   }
 
   function finishTypingImmediately(step) {
