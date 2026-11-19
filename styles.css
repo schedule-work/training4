@@ -67,16 +67,6 @@ body {
   pointer-events: none;
   user-select: none;
   z-index: 1;
-  opacity: 0;
-  transition: opacity 0.22s ease;
-}
-
-.gif-backdrop-img.is-visible {
-  opacity: 1;
-}
-
-.gif-backdrop-img.is-top {
-  z-index: 2;
 }
 
 .gif-stage-img {

@@ -620,11 +620,9 @@
   // ==========================================
   // 4. DOM References & App State
   // ==========================================
-  const gifBackdropA = document.getElementById('gifBackdropA');
-  const gifBackdropB = document.getElementById('gifBackdropB');
+  const gifBackdrop = document.getElementById('gifBackdrop');
   const gifStageA = document.getElementById('gifStageA');
   const gifStageB = document.getElementById('gifStageB');
-  const gifBackdropLayers = [gifBackdropA, gifBackdropB];
   const gifStageLayers = [gifStageA, gifStageB];
   const storySegments = document.getElementById('storySegments');
   const chapterBadge = document.getElementById('chapterBadge');
@@ -730,20 +728,10 @@
   }
 
   function preloadGif(url) {
-    if (!url || preloadedGifs.has(url)) return Promise.resolve();
+    if (!url || preloadedGifs.has(url)) return;
     preloadedGifs.add(url);
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        if (typeof img.decode === 'function') {
-          img.decode().then(resolve).catch(resolve);
-        } else {
-          resolve();
-        }
-      };
-      img.onerror = resolve;
-      img.src = url;
-    });
+    const img = new Image();
+    img.src = url;
   }
 
   function preloadAhead(step) {
@@ -767,19 +755,6 @@
     }
   }
 
-  async function startBackgroundPreloadQueue() {
-    const uniqueUrls = [];
-    STORY_STEPS.forEach((s) => {
-      if (s.gif && uniqueUrls.indexOf(s.gif) === -1) {
-        uniqueUrls.push(s.gif);
-      }
-    });
-    for (let i = 0; i < uniqueUrls.length; i++) {
-      await preloadGif(uniqueUrls[i]);
-      await new Promise((r) => setTimeout(r, 120));
-    }
-  }
-
   function waitImageReady(imgEl, url, expectedSeq) {
     if (!imgEl) return Promise.resolve(true);
     return new Promise((resolve) => {
@@ -790,28 +765,14 @@
         resolve(Boolean(ok && expectedSeq === stageLoadSeq && imgEl.naturalWidth > 0));
       };
       if (imgEl.getAttribute('src') === url && imgEl.complete && imgEl.naturalWidth > 0) {
-        if (typeof imgEl.decode === 'function') {
-          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
-        } else {
-          finish(true);
-        }
+        finish(true);
         return;
       }
-      imgEl.onload = () => {
-        if (typeof imgEl.decode === 'function') {
-          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
-        } else {
-          finish(true);
-        }
-      };
+      imgEl.onload = () => finish(true);
       imgEl.onerror = () => finish(false);
       imgEl.src = url;
       if (imgEl.complete && imgEl.naturalWidth > 0) {
-        if (typeof imgEl.decode === 'function') {
-          imgEl.decode().then(() => finish(true)).catch(() => finish(true));
-        } else {
-          finish(true);
-        }
+        finish(true);
       }
     });
   }
@@ -825,31 +786,25 @@
     const nextIdx = activeLayerIdx === 0 ? 1 : 0;
     const currStage = gifStageLayers[activeLayerIdx];
     const nextStage = gifStageLayers[nextIdx];
-    const currBackdrop = gifBackdropLayers[activeLayerIdx];
-    const nextBackdrop = gifBackdropLayers[nextIdx];
 
     if (!currStage || !nextStage) return;
 
-    Promise.all([
-      waitImageReady(nextStage, url, seq),
-      waitImageReady(nextBackdrop, url, seq)
-    ]).then(([stageOk, backdropOk]) => {
-      if (!stageOk || !backdropOk || seq !== stageLoadSeq) return;
+    waitImageReady(nextStage, url, seq).then((ready) => {
+      if (!ready || seq !== stageLoadSeq) return;
       if (layerRetireTimer) {
         clearTimeout(layerRetireTimer);
         layerRetireTimer = null;
       }
-      // Keep current layer visible at opacity:1 underneath while next layer fades in on top
       currStage.classList.remove('is-top');
-      if (currBackdrop) currBackdrop.classList.remove('is-top');
       nextStage.classList.add('is-top', 'is-visible');
-      if (nextBackdrop) nextBackdrop.classList.add('is-top', 'is-visible');
       activeLayerIdx = nextIdx;
+      if (gifBackdrop) {
+        gifBackdrop.src = url;
+      }
 
       layerRetireTimer = setTimeout(() => {
         if (seq !== stageLoadSeq) return;
         currStage.classList.remove('is-visible');
-        if (currBackdrop) currBackdrop.classList.remove('is-visible');
       }, 240);
     });
   }
@@ -1850,8 +1805,5 @@
     updateSimulatorUI(true);
     renderPoll();
     loadDepartmentsFromSheet();
-    setTimeout(() => {
-      startBackgroundPreloadQueue();
-    }, 600);
   });
 })();
