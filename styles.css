@@ -1807,14 +1807,6 @@ body {
   resize: vertical;
 }
 
-.feedback-select-hint {
-  font-size: 0.75rem;
-  color: #ffd0d8;
-  text-align: center;
-  line-height: 1.4;
-  word-break: keep-all;
-}
-
 .feedback-done-banner {
   margin-top: 10px;
   padding: 12px 13px;

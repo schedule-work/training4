@@ -1795,7 +1795,6 @@
   const pollActivityBlock = document.getElementById('pollActivityBlock');
   const pollOptionsGrid = document.getElementById('pollOptionsGrid');
   const wallInput = document.getElementById('wallInput');
-  const feedbackSelectHint = document.getElementById('feedbackSelectHint');
   const feedbackStatusText = document.getElementById('feedbackStatusText');
   const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
   const feedbackDoneBanner = document.getElementById('feedbackDoneBanner');
@@ -1885,10 +1884,6 @@
     const canSubmit = !!(selectedFeedbackPlace && !isFeedbackSubmitted);
     if (submitFeedbackBtn) {
       submitFeedbackBtn.disabled = !canSubmit;
-    }
-    if (feedbackSelectHint) {
-      feedbackSelectHint.style.display =
-        !selectedFeedbackPlace && !isFeedbackSubmitted ? 'block' : 'none';
     }
   }
 
