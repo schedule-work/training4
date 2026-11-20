@@ -309,7 +309,7 @@
       gif: 'webp/Woman_standing_in_elevator_93eec380.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '그때 엘리베이터 한쪽에 처음 보는 사람이 함께 타고 있는 것이 보였다.\n병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
+      text: '그때 엘리베이터 한쪽에 낯선 사람이 함께 타고 있었지만, 누구인지는 알 수 없었다.',
       holdMs: 3800,
       nextId: 'choice-1'
     },
@@ -530,7 +530,7 @@
       gif: 'webp/Nurse_raising_index_finger_13f6be98.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
-      text: '"밀폐된 공간처럼 느껴지는 엘리베이터 역시 누구나 함께 이용하는 공개된 장소임을 잊지 말아야 합니다."',
+      text: '"엘리베이터는 누구나 함께 이용하는 공용 공간임을 잊지 말아야 합니다."',
       holdMs: 4000,
       nextId: '4-4-2'
     },
