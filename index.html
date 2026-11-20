@@ -151,14 +151,14 @@
           </div>
           <h2 class="sheet-title">잠깐, 나라면 어떻게 할까요?</h2>
           <p class="sheet-desc">
-            엘리베이터 안에 처음 보는 승객이 함께 타고 있습니다. 항목을 선택한 뒤 우측 화살표를 누르면 해당 상황이 펼쳐집니다.
+            누군가 함께 타고 있는 엘리베이터 안, 지금 이 순간 어떤 행동을 선택할지 골라 보세요.
           </p>
 
           <div id="choice1Options" class="choice-list">
             <div class="choice-row" data-choice="continue">
               <button class="choice-btn" type="button" data-choice="continue">
                 <span class="choice-num">1</span>
-                <span class="choice-label">환자 실명은 말하지 않았으니 대화를 이어간다.</span>
+                <span class="choice-label">환자 실명은 말하지 않을 테니 대화를 이어간다.</span>
               </button>
               <button class="choice-go-btn" type="button" data-choice="continue" aria-label="1번 선택 상황 펼치기" tabindex="-1">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -284,7 +284,7 @@
 
           <!-- 4 Clues Linked to Elevator Dialogue -->
           <div class="puzzle-grid">
-            <button class="puzzle-card" type="button" data-piece="room">
+            <div class="puzzle-card" data-piece="room">
               <span class="puzzle-icon-badge tone-room" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
@@ -299,9 +299,9 @@
               <span class="puzzle-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </span>
-            </button>
+            </div>
 
-            <button class="puzzle-card" type="button" data-piece="date">
+            <div class="puzzle-card" data-piece="date">
               <span class="puzzle-icon-badge tone-date" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -311,15 +311,15 @@
                 </svg>
               </span>
               <div class="puzzle-meta">
-                <span class="puzzle-cat">입원 정보</span>
-                <span class="puzzle-val">5월 22일 입원</span>
+                <span class="puzzle-cat">대화 언급</span>
+                <span class="puzzle-val">어제 입원</span>
               </div>
               <span class="puzzle-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </span>
-            </button>
+            </div>
 
-            <button class="puzzle-card" type="button" data-piece="guardian">
+            <div class="puzzle-card" data-piece="guardian">
               <span class="puzzle-icon-badge tone-guardian" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
@@ -335,9 +335,9 @@
               <span class="puzzle-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </span>
-            </button>
+            </div>
 
-            <button class="puzzle-card" type="button" data-piece="test">
+            <div class="puzzle-card" data-piece="test">
               <span class="puzzle-icon-badge tone-test" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -353,7 +353,7 @@
               <span class="puzzle-check" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </span>
-            </button>
+            </div>
           </div>
 
           <div id="identityCard" class="identity-box">
@@ -362,7 +362,7 @@
               <div id="assembledClues" class="assembled-clues"></div>
             </div>
             <p id="identityStatus" class="identity-text">
-              단서를 선택할 때마다 조건과 다른 환자가 제외됩니다.
+              대화 속 단서들이 순서대로 연결되며 환자가 좁혀집니다.
             </p>
           </div>
 
@@ -485,7 +485,7 @@
             </div>
             <h2 class="sheet-title">정답은 D: 공개 장소에서는 대화 중단</h2>
             <p id="compareSummaryText" class="compare-desc">
-              공개된 공간에서는 즉시 환자 관련 대화를 멈추고, 의무기록실·스테이션 등 비공개 업무 공간으로 옮겨 대화해야 합니다.
+              공개 장소에서는 환자 관련 대화를 멈추고 장소를 옮겨야 합니다.
             </p>
           </div>
 
@@ -520,22 +520,29 @@
           </div>
 
           <!-- Single-Select Question (100% Matched to FEEDBACK_OPTIONS.SCENE04) -->
-          <div class="activity-block">
-            <h3 class="activity-title">함께 생각해 볼 질문</h3>
+          <div id="pollActivityBlock" class="activity-block">
+            <div class="activity-title-row">
+              <h3 class="activity-title">함께 생각해 볼 질문</h3>
+              <span class="req-badge is-required">필수</span>
+            </div>
             <p class="activity-sub">병원에서 업무 이야기가 무심코 나오기 쉬운 장소는 어디라고 생각하나요? (1개 선택)</p>
             <div id="pollOptionsGrid" class="poll-options-grid"></div>
           </div>
 
           <!-- Private Anonymous Story Submission (Other users' posts NEVER displayed) -->
           <div class="activity-block">
-            <h3 class="activity-title">익명 이야기 남기기</h3>
+            <div class="activity-title-row">
+              <h3 class="activity-title">익명 이야기 남기기</h3>
+              <span class="req-badge is-optional">선택</span>
+            </div>
             <p class="activity-sub">
               "업무 이야기니까 괜찮겠지"라고 생각하기 쉬웠던 순간이나 원내에서 발생할 수 있는 상황을 남겨 주세요.
             </p>
             <div class="wall-input-box">
               <textarea id="wallInput" class="wall-textarea" placeholder="경험이나 의견을 입력해 주세요 (선택 사항 · 익명 보장)"></textarea>
+              <p id="feedbackSelectHint" class="feedback-select-hint">위 '함께 생각해 볼 질문'에서 장소를 1개 선택하면 제출할 수 있습니다.</p>
               <p id="feedbackStatusText" class="quiz-status-text" aria-live="polite"></p>
-              <button id="submitFeedbackBtn" class="btn-primary btn-block" type="button">
+              <button id="submitFeedbackBtn" class="btn-primary btn-block" type="button" disabled>
                 의견 제출하기
               </button>
             </div>
@@ -544,14 +551,45 @@
             </div>
           </div>
 
-          <button id="finishRestartBtn" class="btn-outline btn-block finish-restart-btn" type="button">
-            처음부터 다시 보기
-          </button>
-
           <footer class="legal-footer">
             「의료법」 제19조 및 「개인정보 보호법」 제18조에 따라 개방된 공간에서의 환자 관련 대화에 각별한 주의가 필요합니다.
           </footer>
         </div>
+      </div>
+    </section>
+
+    <!-- 7. Submission Complete Modal Popup -->
+    <div id="submitCompleteModal" class="complete-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="completeModalTitle">
+      <div class="complete-modal-card">
+        <div class="complete-icon-circle" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2 id="completeModalTitle" class="complete-modal-title">제출이 완료되었습니다</h2>
+        <p id="completeModalDesc" class="complete-modal-desc">
+          응답과 소중한 의견이 안전하게 기록되었습니다.<br>확인을 누르면 교육이 종료됩니다.
+        </p>
+        <button id="confirmEndEduBtn" class="btn-primary btn-block" type="button">
+          교육 종료하기
+        </button>
+      </div>
+    </div>
+
+    <!-- 8. Education Ended Screen (No Replay Button) -->
+    <section id="endOverlay" class="overlay-screen end-overlay" aria-label="교육 종료 안내">
+      <div class="end-card">
+        <span class="edu-pill is-done">개인정보보호 4회차 · 참여 완료</span>
+        <div class="end-check-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h2 class="end-title">교육이 종료되었습니다</h2>
+        <p class="end-desc">
+          응답 및 의견 제출이 정상적으로 완료되었습니다.<br>브라우저 창을 닫아 교육을 종료해 주세요.
+        </p>
+        <div id="endDeptMeta" class="end-meta-pill"></div>
       </div>
     </section>
   </main>

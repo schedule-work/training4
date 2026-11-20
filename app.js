@@ -14,10 +14,21 @@
     'https://script.google.com/macros/s/AKfycbwMM9fE1PnRgaCvhnbMZwnrrudy5sMoTiJyxDwDxvdS4PztExj2akBr0NsTfFeDH7a_2g/exec';
 
   // ==========================================
-  // 1. Web Audio Synthesizer
+  // 1. Audio System (음원 폴더 + Web Audio Fallback)
   // ==========================================
+  const AUDIO_PATHS = {
+    bgm: encodeURI('음원/배경음악.mp3'),
+    tap: encodeURI('음원/선택.wav'),
+    confirm: encodeURI('음원/선택2.wav'),
+    subtitle: encodeURI('음원/자막.mp3')
+  };
+
   let audioCtx = null;
   let isSoundEnabled = true;
+  let bgmAudio = null;
+  let subtitleAudio = null;
+  const decodedSfxBuffers = { tap: null, confirm: null };
+  const decodedSfxLoading = { tap: false, confirm: false };
 
   function initAudio() {
     if (!audioCtx) {
@@ -29,6 +40,102 @@
     if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume().catch(() => {});
     }
+    ensureSfxBuffer('tap');
+    ensureSfxBuffer('confirm');
+  }
+
+  function ensureBgmAudio() {
+    if (!bgmAudio) {
+      bgmAudio = new Audio(AUDIO_PATHS.bgm);
+      bgmAudio.loop = true;
+      bgmAudio.volume = 0.24;
+      bgmAudio.preload = 'auto';
+    }
+    return bgmAudio;
+  }
+
+  function ensureSubtitleAudio() {
+    if (!subtitleAudio) {
+      subtitleAudio = new Audio(AUDIO_PATHS.subtitle);
+      subtitleAudio.loop = true;
+      subtitleAudio.volume = 0.38;
+      subtitleAudio.preload = 'auto';
+    }
+    return subtitleAudio;
+  }
+
+  function ensureSfxBuffer(key) {
+    if (decodedSfxBuffers[key] || decodedSfxLoading[key]) return;
+    if (!audioCtx || window.location.protocol === 'file:') return;
+    decodedSfxLoading[key] = true;
+    fetch(AUDIO_PATHS[key])
+      .then((resp) => (resp.ok ? resp.arrayBuffer() : null))
+      .then((buf) => (buf && audioCtx ? audioCtx.decodeAudioData(buf) : null))
+      .then((decoded) => {
+        if (decoded) decodedSfxBuffers[key] = decoded;
+      })
+      .catch(() => {})
+      .finally(() => {
+        decodedSfxLoading[key] = false;
+      });
+  }
+
+  function playSfxFile(key, volume) {
+    if (!isSoundEnabled) return;
+    initAudio();
+    const buffer = decodedSfxBuffers[key];
+    if (audioCtx && buffer) {
+      try {
+        const source = audioCtx.createBufferSource();
+        const gain = audioCtx.createGain();
+        source.buffer = buffer;
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        source.connect(gain);
+        gain.connect(audioCtx.destination);
+        source.start(0);
+        return;
+      } catch (ignore) {}
+    }
+    try {
+      const audio = new Audio(AUDIO_PATHS[key]);
+      audio.volume = volume;
+      audio.play().catch(() => {});
+    } catch (ignore) {}
+  }
+
+  function startBgm() {
+    if (!isSoundEnabled || !isStarted || isEnded || document.hidden) return;
+    const audio = ensureBgmAudio();
+    if (audio.paused) {
+      audio.play().catch(() => {});
+    }
+  }
+
+  function pauseBgm(reset) {
+    if (!bgmAudio) return;
+    bgmAudio.pause();
+    if (reset) {
+      bgmAudio.currentTime = 0;
+    }
+  }
+
+  function startSubtitleSfx() {
+    if (!isSoundEnabled || !isStarted || isEnded || document.hidden || !isTyping) return;
+    const audio = ensureSubtitleAudio();
+    try {
+      if (audio.paused) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    } catch (ignore) {}
+  }
+
+  function stopSubtitleSfx() {
+    if (!subtitleAudio) return;
+    subtitleAudio.pause();
+    try {
+      subtitleAudio.currentTime = 0;
+    } catch (ignore) {}
   }
 
   const Sound = {
@@ -62,41 +169,15 @@
     },
 
     tap: function () {
-      if (!isSoundEnabled) return;
-      initAudio();
-      if (!audioCtx) return;
+      playSfxFile('tap', 0.55);
+    },
 
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(420, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.08);
-      gain.gain.setValueAtTime(0.11, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.08);
+    confirm: function () {
+      playSfxFile('confirm', 0.6);
     },
 
     snap: function () {
-      if (!isSoundEnabled) return;
-      initAudio();
-      if (!audioCtx) return;
-
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(520, now);
-      osc.frequency.setValueAtTime(780, now + 0.05);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.16);
+      playSfxFile('confirm', 0.6);
     },
 
     correct: function () {
@@ -202,7 +283,7 @@
       gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
-      text: '"아까 701호 환자 말이야."',
+      text: '"아까 회진 돌았던 환자분 말이야."',
       holdMs: 3000,
       nextId: '4-1-3'
     },
@@ -212,11 +293,11 @@
       kind: 'speech',
       chapter: 1,
       floor: '07F',
-      gif: 'webp/Nurses_talking_in_elevator_8afa24f8.webp',
+      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
       speaker: '동료 간호사',
       role: 'colleague',
-      text: '"응, 보호자랑 이야기하는데 조금 힘들었어."',
-      holdMs: 3200,
+      text: '"아, 그분? 나도 방금 회진 끝나고 좀 신경 쓰이긴 했는데."',
+      holdMs: 3400,
       nextId: '4-1-4'
     },
     {
@@ -225,36 +306,10 @@
       kind: 'narration',
       chapter: 1,
       floor: '07F',
-      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
-      speaker: '상황 설명',
-      role: 'narration',
-      text: '둘은 방금 전 담당했던 환자 이야기를 자연스럽게 이어갔다.',
-      holdMs: 3200,
-      nextId: '4-1-5'
-    },
-    {
-      id: '4-1-5',
-      type: 'dialogue',
-      kind: 'speech',
-      chapter: 1,
-      floor: '07F',
-      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
-      speaker: '동료 간호사',
-      role: 'colleague',
-      text: '"검사 결과 생각보다 안 좋다고 하던데..."',
-      holdMs: 3400,
-      nextId: '4-1-6'
-    },
-    {
-      id: '4-1-6',
-      type: 'dialogue',
-      kind: 'narration',
-      chapter: 1,
-      floor: '07F',
       gif: 'webp/Woman_standing_in_elevator_93eec380.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '엘리베이터 한쪽에는 처음 보는 사람이 함께 타고 있었다.\n병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
+      text: '그때 엘리베이터 한쪽에 처음 보는 사람이 함께 타고 있는 것이 보였다.\n병원 직원은 아닌 것 같았지만, 누구인지는 알 수 없었다.',
       holdMs: 3800,
       nextId: 'choice-1'
     },
@@ -289,7 +344,7 @@
       gif: 'webp/Woman_stepping_out_of_elevator_46d1ab01.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '6층에서 함께 타고 있던 승객이 내렸다.\n대화를 멈춘 덕분에 환자의 정보는 전혀 노출되지 않았다.',
+      text: '6층에서 함께 타고 있던 승객이 내렸다.\n구체적인 환자 이야기를 꺼내기 전에 대화를 멈춘 덕분에 환자의 정보는 전혀 노출되지 않았다.',
       holdMs: 3800,
       sfx: 'elevatorChime',
       nextId: 'safe-result'
@@ -302,7 +357,7 @@
       gif: 'webp/Nurse_raising_index_finger_13f6be98.webp'
     },
 
-    // Branch B: 위험 시나리오 - 장면 4-2
+    // Branch B: 위험 시나리오 - 장면 4-2 (대화를 이어가며 4가지 단서 노출)
     {
       id: '4-2-1',
       type: 'dialogue',
@@ -325,7 +380,7 @@
       gif: 'webp/Nurses_whispering_in_elevator_681480a8.webp',
       speaker: '동료 간호사',
       role: 'colleague',
-      text: '"이름도 말 안 했는데 이 정도는 괜찮지 않을까?"',
+      text: '"이름만 말 안 하면 이 정도는 괜찮지 않을까?"',
       holdMs: 3400,
       nextId: '4-2-3'
     },
@@ -338,12 +393,38 @@
       gif: 'webp/Nurse_nodding_in_elevator_1edc08f8.webp',
       speaker: '상황 설명',
       role: 'narration',
-      text: '지윤도 별다른 생각 없이 고개를 끄덕였다.',
+      text: '지윤도 별다른 생각 없이 고개를 끄덕이며 대화를 이어갔다.',
       holdMs: 3200,
       nextId: '4-2-4'
     },
     {
       id: '4-2-4',
+      type: 'dialogue',
+      kind: 'speech',
+      chapter: 2,
+      floor: '07F',
+      gif: 'webp/Nurses_talking_in_elevator_771bf125.webp',
+      speaker: '지윤 간호사',
+      role: 'jiyun',
+      text: '"701호 어제 입원한 분 말인데, 따님 보호자분이 걱정을 많이 하시더라고."',
+      holdMs: 3800,
+      nextId: '4-2-5'
+    },
+    {
+      id: '4-2-5',
+      type: 'dialogue',
+      kind: 'speech',
+      chapter: 2,
+      floor: '07F',
+      gif: 'webp/Nurses_whispering_in_elevator_681480a8.webp',
+      speaker: '동료 간호사',
+      role: 'colleague',
+      text: '"아침에 찍은 CT에 이상 소견이 나와서 오후에 주치의 면담 잡아야 할 것 같아."',
+      holdMs: 3800,
+      nextId: '4-2-6'
+    },
+    {
+      id: '4-2-6',
       type: 'dialogue',
       kind: 'narration',
       chapter: 2,
@@ -352,12 +433,12 @@
       speaker: '상황 설명',
       role: 'narration',
       text: '다음 층에서 함께 있던 그 사람이 내리며 휴대전화를 꺼냈다.',
-      holdMs: 4400,
+      holdMs: 4200,
       sfx: 'elevatorChime',
-      nextId: '4-2-5'
+      nextId: '4-2-7'
     },
     {
-      id: '4-2-5',
+      id: '4-2-7',
       type: 'dialogue',
       kind: 'thought',
       chapter: 2,
@@ -367,10 +448,10 @@
       role: 'passenger',
       text: '"그 병실이면 혹시…."',
       holdMs: 3400,
-      nextId: '4-2-6'
+      nextId: '4-2-8'
     },
     {
-      id: '4-2-6',
+      id: '4-2-8',
       type: 'dialogue',
       kind: 'narration',
       chapter: 2,
@@ -381,10 +462,10 @@
       text: '그때, 지윤은 문득 생각했다.',
       holdMs: 3000,
       sfx: 'heartbeat',
-      nextId: '4-2-7'
+      nextId: '4-2-9'
     },
     {
-      id: '4-2-7',
+      id: '4-2-9',
       type: 'dialogue',
       kind: 'thought',
       chapter: 2,
@@ -392,7 +473,7 @@
       gif: 'webp/Woman_resting_chin_thoughtfully_1d7844eb.webp',
       speaker: '지윤 간호사',
       role: 'jiyun',
-      text: '"병실 번호, 검사 결과, 보호자 상황만으로도 누군가는 누구의 이야기인지 알아챌 수 있다는 것을…!"',
+      text: '"병실 번호, 입원 시기, 보호자 상황, 검사 결과만으로도 누군가는 누구의 이야기인지 알아챌 수 있다는 것을…!"',
       holdMs: 4200,
       nextId: '4-3-intro'
     },
@@ -548,18 +629,28 @@
   }
 
   async function apiPostAction(payload) {
-    const resp = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    });
-    const text = await resp.text();
-    const json = parseJsonResponseText(text);
-    if (!json || !json.ok) {
-      throw new Error((json && json.error) || '요청 처리 중 오류가 발생했습니다.');
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 15000) : null;
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow',
+        signal: controller ? controller.signal : undefined
+      });
+      if (!resp.ok) {
+        throw new Error(`HTTP_${resp.status}`);
+      }
+      const text = await resp.text();
+      const json = parseJsonResponseText(text);
+      if (!json || !json.ok) {
+        throw new Error((json && json.error) || '요청 처리 중 오류가 발생했습니다.');
+      }
+      return json;
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
     }
-    return json;
   }
 
   async function apiSubmitQuiz(dept, ans, uuid) {
@@ -620,9 +711,14 @@
   const soundOffIcon = document.getElementById('soundOffIcon');
   const restartBtn = document.getElementById('restartBtn');
 
+  const hudTop = document.getElementById('hudTop');
   const tapCatcher = document.getElementById('tapCatcher');
   const startOverlay = document.getElementById('startOverlay');
   const startEduBtn = document.getElementById('startEduBtn');
+  const submitCompleteModal = document.getElementById('submitCompleteModal');
+  const confirmEndEduBtn = document.getElementById('confirmEndEduBtn');
+  const endOverlay = document.getElementById('endOverlay');
+  const endDeptMeta = document.getElementById('endDeptMeta');
 
   const dialogueOverlay = document.getElementById('dialogueOverlay');
   const dialogueCard = document.getElementById('dialogueCard');
@@ -647,6 +743,7 @@
   const historyStack = [];
   let currentStepId = '4-1-1';
   let isStarted = false;
+  let isEnded = false;
   let isAutoPlay = true;
   let typingTimer = null;
   let autoTimer = null;
@@ -692,7 +789,12 @@
 
   function updateSegments(step) {
     const ch = step.chapter;
-    const chSteps = STORY_STEPS.filter((s) => s.chapter === ch && !s.id.startsWith('safe-'));
+    const isSafeBranch = step.id.startsWith('safe-');
+    const chSteps = STORY_STEPS.filter((s) =>
+      isSafeBranch
+        ? s.id.startsWith('safe-')
+        : s.chapter === ch && !s.id.startsWith('safe-')
+    );
     const posInCh = chSteps.findIndex((s) => s.id === step.id);
     const ratio = posInCh >= 0 && chSteps.length > 0
       ? Math.round(((posInCh + 1) / chSteps.length) * 100)
@@ -735,8 +837,8 @@
       }
     }
     if (
-      step.id === '4-1-5' ||
-      step.id === '4-1-6' ||
+      step.id === '4-1-3' ||
+      step.id === '4-1-4' ||
       step.id === 'choice-1' ||
       step.id.startsWith('safe-')
     ) {
@@ -745,11 +847,14 @@
         'safe-2',
         'safe-result',
         '4-2-1',
+        '4-2-2',
         '4-2-3',
         '4-2-4',
         '4-2-5',
         '4-2-6',
         '4-2-7',
+        '4-2-8',
+        '4-2-9',
         '4-3-intro',
         '4-3'
       ].forEach((targetId) => {
@@ -866,6 +971,7 @@
       stopPuzzleAutoPlay();
     }
     isTyping = false;
+    stopSubtitleSfx();
     if (autoProgressBar) {
       autoProgressBar.style.width = '0%';
     }
@@ -931,6 +1037,7 @@
       typingTimer = null;
     }
     isTyping = false;
+    stopSubtitleSfx();
     if (dialogueText) {
       dialogueText.textContent = step.text;
     }
@@ -966,17 +1073,29 @@
         : '화면을 터치하면 다음 장면으로 이동';
     }
 
-    if (dialogueText) {
-      dialogueText.textContent = '';
-    }
-    isTyping = true;
-    let charPos = 0;
     const fullText = step.text;
+    let visibleSpan = null;
+    let ghostSpan = null;
+    if (dialogueText) {
+      dialogueText.innerHTML = '';
+      visibleSpan = document.createElement('span');
+      ghostSpan = document.createElement('span');
+      ghostSpan.className = 'dialogue-text-ghost';
+      ghostSpan.setAttribute('aria-hidden', 'true');
+      ghostSpan.textContent = fullText;
+      dialogueText.appendChild(visibleSpan);
+      dialogueText.appendChild(ghostSpan);
+    }
+
+    isTyping = true;
+    startSubtitleSfx();
+    let charPos = 0;
 
     typingTimer = setInterval(() => {
       charPos += 1;
-      if (dialogueText) {
-        dialogueText.textContent = fullText.slice(0, charPos);
+      if (visibleSpan && ghostSpan) {
+        visibleSpan.textContent = fullText.slice(0, charPos);
+        ghostSpan.textContent = fullText.slice(charPos);
       }
       if (charPos >= fullText.length) {
         finishTypingImmediately(step);
@@ -1069,11 +1188,15 @@
       selectedDepartment = dept;
       if (quizDeptPill) quizDeptPill.textContent = dept;
 
-      initAudio();
-      Sound.tap();
       isStarted = true;
+      isEnded = false;
+      initAudio();
+      Sound.confirm();
+      startBgm();
       historyStack.length = 0;
       if (startOverlay) startOverlay.classList.remove('active');
+      if (endOverlay) endOverlay.classList.remove('active');
+      if (hudTop) hudTop.style.display = '';
       navigateTo('4-1-1', false);
     });
   }
@@ -1144,12 +1267,19 @@
       if (isSoundEnabled) {
         initAudio();
         Sound.tap();
+        startBgm();
+        if (isTyping) startSubtitleSfx();
+      } else {
+        pauseBgm(false);
+        stopSubtitleSfx();
       }
     });
   }
 
   function resetAllEducation() {
     clearTimers();
+    pauseBgm(true);
+    stopSubtitleSfx();
     clearChoice1Selection();
     resetQuiz();
     resetPuzzle();
@@ -1158,7 +1288,11 @@
     currentStepId = '4-1-1';
     lastFloor = '07F';
     isStarted = false;
+    isEnded = false;
     hideAllSheets();
+    if (submitCompleteModal) submitCompleteModal.classList.remove('active');
+    if (endOverlay) endOverlay.classList.remove('active');
+    if (hudTop) hudTop.style.display = '';
     if (dialogueOverlay) dialogueOverlay.classList.remove('active');
     if (tapCatcher) tapCatcher.style.display = 'none';
     if (startOverlay) startOverlay.classList.add('active');
@@ -1217,11 +1351,10 @@
         e.stopPropagation();
         const val = this.getAttribute('data-choice');
         if (!val || val !== selectedChoice1) return;
+        Sound.confirm();
         if (val === 'pause') {
-          Sound.correct();
           navigateTo('safe-1', true);
         } else {
-          Sound.tap();
           navigateTo('4-2-1', true);
         }
       });
@@ -1479,6 +1612,7 @@
   // ==========================================
   // 9. Scene 4-4: 12-Patient Elimination Board & Inline Caution Places
   // ==========================================
+  // 4단계 순차 축소: room(5명) -> date(3명) -> guardian(2명) -> test(1명, 환자6 홍OO 특정)
   const COHORT_PATIENTS = [
     { id: 1, room: false, date: true, guardian: true, test: false },
     { id: 2, room: false, date: true, guardian: false, test: true },
@@ -1488,15 +1622,15 @@
     { id: 6, room: true, date: true, guardian: true, test: true, isTarget: true },
     { id: 7, room: false, date: true, guardian: false, test: false },
     { id: 8, room: false, date: false, guardian: true, test: false },
-    { id: 9, room: true, date: true, guardian: false, test: false },
-    { id: 10, room: false, date: true, guardian: true, test: true },
+    { id: 9, room: true, date: true, guardian: false, test: true },
+    { id: 10, room: true, date: true, guardian: true, test: false },
     { id: 11, room: true, date: false, guardian: false, test: true },
     { id: 12, room: false, date: false, guardian: false, test: true }
   ];
 
   const PIECE_LABELS = {
     room: '701호',
-    date: '5월 22일 입원',
+    date: '어제 입원',
     guardian: '모녀 동행',
     test: 'CT 이상 소견'
   };
@@ -1545,7 +1679,6 @@
       if (el) {
         el.classList.toggle('eliminated', !matches);
         const label = el.querySelector('.cohort-person-label');
-        const isFinalSingle = activeClues.length >= 2 && matches && pt.isTarget;
         el.classList.toggle('identified', false);
         if (label) {
           label.textContent = `환자 ${idx + 1}`;
@@ -1598,7 +1731,7 @@
       if (isIdentified) {
         Sound.dangerAlert();
       } else {
-        Sound.snap();
+        Sound.tap();
       }
     }
   }
@@ -1659,19 +1792,20 @@
   const deptStatsTitle = document.getElementById('deptStatsTitle');
   const deptStatsCount = document.getElementById('deptStatsCount');
   const deptStatsBars = document.getElementById('deptStatsBars');
+  const pollActivityBlock = document.getElementById('pollActivityBlock');
   const pollOptionsGrid = document.getElementById('pollOptionsGrid');
   const wallInput = document.getElementById('wallInput');
+  const feedbackSelectHint = document.getElementById('feedbackSelectHint');
   const feedbackStatusText = document.getElementById('feedbackStatusText');
   const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
   const feedbackDoneBanner = document.getElementById('feedbackDoneBanner');
   const summaryBackBtn = document.getElementById('summaryBackBtn');
-  const finishRestartBtn = document.getElementById('finishRestartBtn');
 
   const OPTION_FEEDBACK_NOTES = {
     A: '환자 실명을 언급하지 않았더라도 병실 번호, 검사 결과, 보호자 정보 등이 결합되면 누구인지 알아챌 수 있습니다.',
     B: '엘리베이터나 복도는 작은 속삭임도 주변 사람에게 그대로 전달되기 쉬워 공개 장소 대화를 피해야 합니다.',
     C: '의료진 간의 정당한 업무 대화라도 제3자가 있는 공개 공간에서는 비밀유지 의무 위반 소지가 있습니다.',
-    D: '공개된 공간에서는 즉시 환자 관련 대화를 멈추고 의무기록실·스테이션 등 비공개 업무 공간으로 옮기는 것이 가장 안전합니다.',
+    D: '공개 장소에서는 환자 관련 대화를 멈추고 장소를 옮겨야 합니다.',
     E: '탑승객 모두의 직무 관련성을 일일이 확인할 수 없으며, 타 부서 직원이라도 해당 환자 치료와 무관하다면 정보 노출에 해당합니다.'
   };
 
@@ -1703,7 +1837,7 @@
         compareSummaryText.textContent = OPTION_FEEDBACK_NOTES.D;
       } else if (OPTION_FEEDBACK_NOTES[ans]) {
         compareSummaryText.textContent =
-          `선택하신 ${ans}번은 주의가 필요합니다. ${OPTION_FEEDBACK_NOTES[ans]} 따라서 공개 장소에서는 대화를 멈추고 장소를 옮겨야 합니다(D).`;
+          `선택하신 ${ans}는 주의가 필요합니다. ${OPTION_FEEDBACK_NOTES[ans]} 따라서 ${OPTION_FEEDBACK_NOTES.D}`;
       } else {
         compareSummaryText.textContent = OPTION_FEEDBACK_NOTES.D;
       }
@@ -1747,6 +1881,17 @@
       .join('');
   }
 
+  function updateFeedbackSubmitState() {
+    const canSubmit = !!(selectedFeedbackPlace && !isFeedbackSubmitted);
+    if (submitFeedbackBtn) {
+      submitFeedbackBtn.disabled = !canSubmit;
+    }
+    if (feedbackSelectHint) {
+      feedbackSelectHint.style.display =
+        !selectedFeedbackPlace && !isFeedbackSubmitted ? 'block' : 'none';
+    }
+  }
+
   function renderPoll() {
     if (!pollOptionsGrid) return;
     pollOptionsGrid.innerHTML = '';
@@ -1767,16 +1912,19 @@
         if (isFeedbackSubmitted) return;
         Sound.tap();
         selectedFeedbackPlace = labelText;
+        if (pollActivityBlock) pollActivityBlock.classList.remove('needs-attention');
         if (feedbackStatusText) feedbackStatusText.textContent = '';
         renderPoll();
       });
       pollOptionsGrid.appendChild(btn);
     });
+    updateFeedbackSubmitState();
   }
 
   function resetFeedbackSection() {
     selectedFeedbackPlace = '';
     isFeedbackSubmitted = false;
+    if (pollActivityBlock) pollActivityBlock.classList.remove('needs-attention');
     if (wallInput) {
       wallInput.value = '';
       wallInput.disabled = false;
@@ -1784,11 +1932,48 @@
     if (feedbackStatusText) feedbackStatusText.textContent = '';
     if (submitFeedbackBtn) {
       submitFeedbackBtn.style.display = 'inline-flex';
-      submitFeedbackBtn.disabled = false;
+      submitFeedbackBtn.disabled = true;
       submitFeedbackBtn.textContent = '의견 제출하기';
     }
     if (feedbackDoneBanner) feedbackDoneBanner.style.display = 'none';
     renderPoll();
+  }
+
+  function openSubmitCompleteModal() {
+    if (submitCompleteModal) {
+      submitCompleteModal.classList.add('active');
+    }
+    if (confirmEndEduBtn) {
+      confirmEndEduBtn.focus();
+    }
+  }
+
+  function enterEducationEndedState() {
+    isEnded = true;
+    clearTimers();
+    pauseBgm(true);
+    stopSubtitleSfx();
+    hideAllSheets();
+    if (submitCompleteModal) submitCompleteModal.classList.remove('active');
+    if (dialogueOverlay) dialogueOverlay.classList.remove('active');
+    if (tapCatcher) tapCatcher.style.display = 'none';
+    if (hudTop) hudTop.style.display = 'none';
+    if (endDeptMeta) {
+      endDeptMeta.textContent = selectedDepartment
+        ? `참여 부서: ${selectedDepartment}`
+        : '개인정보보호 4회차 이수 완료';
+    }
+    if (endOverlay) endOverlay.classList.add('active');
+  }
+
+  if (confirmEndEduBtn) {
+    confirmEndEduBtn.addEventListener('click', function () {
+      Sound.confirm();
+      enterEducationEndedState();
+      try {
+        window.close();
+      } catch (ignore) {}
+    });
   }
 
   if (submitFeedbackBtn) {
@@ -1797,6 +1982,10 @@
       if (!selectedFeedbackPlace) {
         if (feedbackStatusText) {
           feedbackStatusText.textContent = '위 "함께 생각해 볼 질문"에서 장소를 1개 선택해 주세요.';
+        }
+        if (pollActivityBlock) {
+          pollActivityBlock.classList.add('needs-attention');
+          pollActivityBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         return;
       }
@@ -1817,11 +2006,12 @@
       try {
         await apiSubmitFeedback(dept, selectedFeedbackPlace, idea);
         isFeedbackSubmitted = true;
-        Sound.correct();
+        Sound.confirm();
         renderPoll();
         if (wallInput) wallInput.disabled = true;
         submitFeedbackBtn.style.display = 'none';
         if (feedbackDoneBanner) feedbackDoneBanner.style.display = 'block';
+        openSubmitCompleteModal();
       } catch (err) {
         submitFeedbackBtn.disabled = false;
         submitFeedbackBtn.textContent = '의견 제출하기';
@@ -1836,16 +2026,25 @@
   }
 
   if (summaryBackBtn) summaryBackBtn.addEventListener('click', goPrevStep);
-  if (finishRestartBtn) {
-    finishRestartBtn.addEventListener('click', function () {
-      Sound.tap();
-      resetAllEducation();
-    });
-  }
 
   // ==========================================
-  // 11. Initialize
+  // 11. Initialize & Lifecycle Audio Handling
   // ==========================================
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      pauseBgm(false);
+      stopSubtitleSfx();
+    } else if (isSoundEnabled && isStarted && !isEnded) {
+      startBgm();
+      if (isTyping) startSubtitleSfx();
+    }
+  });
+
+  window.addEventListener('pagehide', function () {
+    pauseBgm(false);
+    stopSubtitleSfx();
+  });
+
   document.addEventListener('DOMContentLoaded', function () {
     initSegments();
     initCohortGrid();
